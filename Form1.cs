@@ -3,13 +3,26 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
+using System.Threading;
+using System.ComponentModel;
+using System.Data;
 
 namespace ExtTDG
 {
     public partial class Form1 : Form
     {
+        private Dictionary<DataClassType, IGenerator> generatorTypes= new Dictionary<DataClassType, IGenerator>();
         private bool m_isFileSelected = false;
         private bool m_allowOverwrite = false;
+
+        private List<List<string>> m_allResults = new List<List<string>>();
+        private List<GeneratorParameters> m_generatorParameters = new List<GeneratorParameters>();
+        private List<GeneratorStats> m_generatorStats = new List<GeneratorStats>();
+        private long m_generationDuration;
+        private long m_fileWriteDuration;
+
+        // Background workers
+        private System.ComponentModel.BackgroundWorker m_worker = new System.ComponentModel.BackgroundWorker();
 
         private enum DataClassType
         {
@@ -85,6 +98,10 @@ namespace ExtTDG
         public Form1()
         {
             InitializeComponent();
+
+            // Initialize background worker
+            m_worker.DoWork += new DoWorkEventHandler(StartBackgroundWork);
+            m_worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(FinishedBackgroundWork);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -94,7 +111,7 @@ namespace ExtTDG
 
         private void btnGenerate_Click(object sender, EventArgs e)
         {
-            List<GeneratorParameters> generatorParameters = GetGeneratorParameters();
+            m_generatorParameters = GetGeneratorParameters();
             SessionParameters sessionParameters = GetSessionParameters();
 
             // Cache error messages and show them to user
@@ -129,176 +146,88 @@ namespace ExtTDG
                 }
             }
 
-            // 1) Tee lista ajettavista generaattoreista
-            // 2) Parametrit täytetään jo konstruktorissa paitsi lukumäärä ja anomaliatodennäköisyyttä
-            // 3) Aligeneraattori palauttaa Generate()-metodista listan (List<string>) tuloksista
             if (sessionParametersOk)
             {
-                Stopwatch sw = new Stopwatch();
-                List<List<string>> allResults = new List<List<string>>();
-                List<string> generatorResults = new List<string>();
-                List<GeneratorStats> generatorStats = new List<GeneratorStats>();
-
+                m_allResults.Clear();
+                m_generatorStats.Clear();
 
                 // Initialize progress bar
-                tsProgressBar.Maximum = generatorParameters.Count;
+                tsProgressBar.Minimum = 0;
+                tsProgressBar.Maximum = m_generatorParameters.Count + 1; // One for 
                 tsProgressBar.Step = 1;
                 tsProgressBar.Value = 0;
 
                 // Reset toolstrip status text
                 tsStatusLabel.Text = "Generating...";
-                tsStatusDuration.Text = "Generating...";
+                tsStatusDuration.Text = "";
 
-                foreach (GeneratorParameters gp in generatorParameters)
+                // Cache generators key-value-pairs used in this session
+                foreach (GeneratorParameters gp in m_generatorParameters)
                 {
                     switch (gp.dataClassType)
                     {
                         case DataClassType.Name:
-                            sw.Reset();
-                            sw.Start();
-                            GeneratorName generatorName = new GeneratorName(
-                                gp.allowedCharacters, gp.anomalyCharacters,
-                                gp.minLength, gp.maxLength,
-                                gp.hasAnomalies, gp.isUnique);
-
-                            generatorResults = generatorName.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
-                            sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
-                            allResults.Add(generatorResults);
+                            generatorTypes[gp.dataClassType] = new GeneratorName(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
                             break;
 
                         case DataClassType.Int32:
-                            sw.Reset();
-                            sw.Start();
-                            GeneratorInt32 generatorInt32 = new GeneratorInt32(
-                                gp.allowedCharacters, gp.anomalyCharacters,
-                                gp.minLength, gp.maxLength,
-                                gp.hasAnomalies, gp.isUnique);
-
-                            generatorResults = generatorInt32.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
-                            sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
-                            allResults.Add(generatorResults);
+                            generatorTypes[gp.dataClassType] = new GeneratorInt32(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
                             break;
 
                         case DataClassType.Email:
-                            sw.Reset();
-                            sw.Start();
-                            GeneratorEmail generatorEmail = new GeneratorEmail(
-                                gp.allowedCharacters, gp.anomalyCharacters,
-                                gp.minLength, gp.maxLength,
-                                gp.hasAnomalies, gp.isUnique);
-
-                            generatorResults = generatorEmail.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
-                            sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
-                            allResults.Add(generatorResults);
+                            generatorTypes[gp.dataClassType] = new GeneratorEmail(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
                             break;
 
                         case DataClassType.Date:
-                            sw.Reset();
-                            sw.Start();
-                            GeneratorDate generatorDate = new GeneratorDate(
-                                gp.allowedCharacters, gp.anomalyCharacters,
-                                gp.minLength.ToString(), gp.maxLength.ToString(),
-                                gp.hasAnomalies, gp.isUnique);
-
-                            generatorResults = generatorDate.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
-                            sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
-                            allResults.Add(generatorResults);
+                            generatorTypes[gp.dataClassType] = new GeneratorDate(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
                             break;
 
                         case DataClassType.Address:
-                            sw.Reset();
-                            sw.Start();
-                            GeneratorAddress generatorAddress = new GeneratorAddress(
-                                gp.allowedCharacters, gp.anomalyCharacters,
-                                gp.minLength, gp.maxLength,
-                                gp.hasAnomalies, gp.isUnique);
-
-                            generatorResults = generatorAddress.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
-                            sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
-                            allResults.Add(generatorResults);
+                            generatorTypes[gp.dataClassType] = new GeneratorAddress(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
                             break;
 
                         case DataClassType.Phone:
-                            sw.Reset();
-                            sw.Start();
-                            GeneratorPhone generatorPhone = new GeneratorPhone(
-                                gp.allowedCharacters, gp.anomalyCharacters,
-                                gp.minLength, gp.maxLength,
-                                gp.hasAnomalies, gp.isUnique);
-
-                            generatorResults = generatorPhone.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
-                            sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
-                            allResults.Add(generatorResults);
+                            generatorTypes[gp.dataClassType] = new GeneratorPhone(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
                             break;
 
                         case DataClassType.URL:
-                            sw.Reset();
-                            sw.Start();
-                            GeneratorURL generatorURL = new GeneratorURL(
-                                gp.allowedCharacters, gp.anomalyCharacters,
-                                gp.minLength, gp.maxLength,
-                                gp.hasAnomalies, gp.isUnique);
-
-                            generatorResults = generatorURL.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
-                            sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
-                            allResults.Add(generatorResults);
+                            generatorTypes[gp.dataClassType] = new GeneratorURL(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
                             break;
 
                         case DataClassType.ID:
-                            sw.Reset();
-                            sw.Start();
-                            GeneratorID generatorID = new GeneratorID(
-                                gp.allowedCharacters, gp.anomalyCharacters,
-                                gp.minLength, gp.maxLength,
-                                gp.hasAnomalies, gp.isUnique);
-
-                            generatorResults = generatorID.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
-                            sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
-                            allResults.Add(generatorResults);
+                            generatorTypes[gp.dataClassType] = new GeneratorID(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
                             break;
 
                         case DataClassType.String:
-                            sw.Reset();
-                            sw.Start();
-                            GeneratorString generatorString = new GeneratorString(
-                                gp.allowedCharacters, gp.anomalyCharacters,
-                                gp.minLength, gp.maxLength,
-                                gp.hasAnomalies, gp.isUnique);
-
-                            generatorResults = generatorString.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
-                            sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
-                            allResults.Add(generatorResults);
+                            generatorTypes[gp.dataClassType] = new GeneratorString(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
                             break;
 
                         default:
-                            break;
+                            throw new Exception("Generator not implemented!");
                     }
+                }
 
+                // Call each subgenerator
+                foreach (GeneratorParameters gp in m_generatorParameters)
+                {
+                    Stopwatch sw = new Stopwatch();
+                    sw.Start();
+                    List<string> generatorResults = generatorTypes[gp.dataClassType].Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
+                    m_generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
+                    m_allResults.Add(generatorResults);
+                    sw.Stop();
                     tsProgressBar.PerformStep();
                 }
 
                 // Display running times
-                PrintStats(generatorStats);
+                PrintStats(m_generatorStats);
+                m_generationDuration = GetTotalDurationInMilliseconds(m_generatorStats);
 
-                // TODO: Selvitä, miten kirjoittaa Excel-tiedostoon nopeammin! Nyt on ihan PERKULEEN hidas! :D
-                // Write results to Excel file
-                Stopwatch swFile = new Stopwatch();
-                swFile.Start();
-                SaveResultsToFile(allResults, generatorParameters);
-                swFile.Stop();
+                // Start background worker for saving results to file
+                m_worker.RunWorkerAsync();
 
-                tsStatusLabel.Text = "Done.";
-                tsStatusDuration.Text = "Completed in " + GetTotalDurationInMilliseconds(generatorStats) + " ms"
-                    + ", writing to file took " + swFile.ElapsedMilliseconds + " ms";
+                // Disable Generate-button until saved results to file
+                btnGenerate.Enabled = false;
             }
 
             // Show error message to user at the end
@@ -383,7 +312,7 @@ namespace ExtTDG
             dgvGenerators.Rows[6].Cells[0].Value = true;
             dgvGenerators.Rows[6].Cells[1].Value = DataClassType.URL;
             dgvGenerators.Rows[6].Cells[2].Value = "abcdefghijklmnopqrstuvwxyz";
-            dgvGenerators.Rows[6].Cells[3].Value = "!#()[]=";
+            dgvGenerators.Rows[6].Cells[3].Value = "!#()[]";
             dgvGenerators.Rows[6].Cells[4].Value = "7";
             dgvGenerators.Rows[6].Cells[5].Value = "30";
             dgvGenerators.Rows[6].Cells[6].Value = true;
@@ -403,7 +332,7 @@ namespace ExtTDG
             dgvGenerators.Rows[8].Cells[0].Value = true;
             dgvGenerators.Rows[8].Cells[1].Value = DataClassType.String;
             dgvGenerators.Rows[8].Cells[2].Value = "abcdefghijklmnopqrstuvwxyz";
-            dgvGenerators.Rows[8].Cells[3].Value = "!#()[]=";
+            dgvGenerators.Rows[8].Cells[3].Value = "!#()[]";
             dgvGenerators.Rows[8].Cells[4].Value = "1";
             dgvGenerators.Rows[8].Cells[5].Value = "10";
             dgvGenerators.Rows[8].Cells[6].Value = true;
@@ -466,7 +395,7 @@ namespace ExtTDG
             Console.WriteLine("Total running time: " + totalRunningTimeMilliseconds + " ms");
         }
 
-        private float GetTotalDurationInMilliseconds(List<GeneratorStats> stats)
+        private long GetTotalDurationInMilliseconds(List<GeneratorStats> stats)
         {
             long totalDurationInMilliseconds = 0;
             foreach (GeneratorStats gs in stats)
@@ -476,8 +405,11 @@ namespace ExtTDG
             return totalDurationInMilliseconds;
         }
 
-        private void SaveResultsToFile(List<List<string>> results, List<GeneratorParameters> gp)
+        //private void SaveResultsToFile(List<List<string>> results, List<GeneratorParameters> gp)
+        private void SaveResultsToFile()
         {
+
+
             object Nothing = System.Reflection.Missing.Value;
             Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
             app.Visible = false;
@@ -487,15 +419,18 @@ namespace ExtTDG
             workSheet.Name = "Results";
 
             // Write all results to file
-            for (int colIndex = 0; colIndex < results.Count; colIndex++)
+            for (int colIndex = 0; colIndex < m_allResults.Count; colIndex++)
             {
-                List<string> rows = results[colIndex];
-                workSheet.Cells[1, colIndex + 1] = gp[colIndex].dataClassTypeName;
-
-                for (int rowIndex = 0; rowIndex < results[colIndex].Count; rowIndex++)
+                List<string> columns = m_allResults[colIndex];
+                
+                // Write header to first cell in each column
+                workSheet.Cells[1, colIndex + 1] = m_generatorParameters[colIndex].dataClassTypeName.ToString();
+                for (int rowIndex = 0; rowIndex < columns.Count; rowIndex++)
                 {
-                    // TODO: Crashes sometimes on third sequential run, maybe COM objects or GC must be called? -Janne
-                    workSheet.Cells[rowIndex + 2, colIndex + 1] = rows[rowIndex];
+                    if(columns[rowIndex] != null)
+                    {
+                        workSheet.Cells[2 + rowIndex, colIndex + 1] = columns[rowIndex].ToString();
+                    }
                 }
             }
 
@@ -503,6 +438,7 @@ namespace ExtTDG
             workBook.Close(false, Type.Missing, Type.Missing);
             app.Quit();
         }
+
 
         // Validate input to cells
         private void dgv_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
@@ -561,6 +497,29 @@ namespace ExtTDG
                 tbFilePath.Text = filePath;
                 m_isFileSelected = true;
             }
+        }
+
+        private void StartBackgroundWork(object sender, DoWorkEventArgs e)
+        {
+            // TODO: Selvitä, miten kirjoittaa Excel-tiedostoon nopeammin! Nyt on ihan PERKULEEN hidas! :D
+            // Write results to Excel file
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            SaveResultsToFile();
+            sw.Stop();
+            m_fileWriteDuration = sw.ElapsedMilliseconds;
+        }
+
+        private void FinishedBackgroundWork(object sender, RunWorkerCompletedEventArgs e)
+        {
+            tsProgressBar.PerformStep();
+
+            // Update toolstrip text
+            tsStatusLabel.Text = "Done.";
+            string genText = "Generation " + m_generationDuration + " ms";
+            string writeText = "file write " + m_fileWriteDuration + " ms";
+            tsStatusDuration.Text = genText + ", " + writeText;
+            btnGenerate.Enabled = true;
         }
     }
 }
