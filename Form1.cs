@@ -196,7 +196,6 @@ namespace ExtTDG
                                 gp.hasAnomalies, gp.isUnique);
 
                             generatorResults = generatorDate.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
-                            generatorResults = new List<string>();
                             sw.Stop();
                             generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
                             allResults.Add(generatorResults);

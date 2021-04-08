@@ -30,6 +30,14 @@
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.dgvGenerators = new System.Windows.Forms.DataGridView();
+            this.colIsActive = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.colDataClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAllowedCharacters = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAnomalyCharacters = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMinLength = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMaxLength = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colHasAnomalies = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.colIsUnique = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
@@ -39,21 +47,13 @@
             this.tbNumItems = new System.Windows.Forms.TextBox();
             this.tbAnomalyChance = new System.Windows.Forms.TextBox();
             this.tbFilePath = new System.Windows.Forms.TextBox();
+            this.btnOpenFileDialog = new System.Windows.Forms.Button();
+            this.cbAllowOverwrite = new System.Windows.Forms.CheckBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.tsStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.tsProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.tsStatusDuration = new System.Windows.Forms.ToolStripStatusLabel();
-            this.btnOpenFileDialog = new System.Windows.Forms.Button();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.cbAllowOverwrite = new System.Windows.Forms.CheckBox();
-            this.colIsActive = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.colDataClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colAllowedCharacters = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colAnomalyCharacters = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMinLength = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMaxLength = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colHasAnomalies = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.colIsUnique = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvGenerators)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -94,6 +94,52 @@
             this.dgvGenerators.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dgvGenerators.Size = new System.Drawing.Size(856, 216);
             this.dgvGenerators.TabIndex = 0;
+            // 
+            // colIsActive
+            // 
+            this.colIsActive.HeaderText = "Is active?";
+            this.colIsActive.Name = "colIsActive";
+            this.colIsActive.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.colIsActive.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // colDataClass
+            // 
+            this.colDataClass.HeaderText = "DataClass";
+            this.colDataClass.Name = "colDataClass";
+            // 
+            // colAllowedCharacters
+            // 
+            this.colAllowedCharacters.HeaderText = "Allowed characters";
+            this.colAllowedCharacters.Name = "colAllowedCharacters";
+            // 
+            // colAnomalyCharacters
+            // 
+            this.colAnomalyCharacters.HeaderText = "Anomaly characters";
+            this.colAnomalyCharacters.Name = "colAnomalyCharacters";
+            // 
+            // colMinLength
+            // 
+            this.colMinLength.HeaderText = "Minimum length / value";
+            this.colMinLength.Name = "colMinLength";
+            // 
+            // colMaxLength
+            // 
+            this.colMaxLength.HeaderText = "Maximum length / value";
+            this.colMaxLength.Name = "colMaxLength";
+            // 
+            // colHasAnomalies
+            // 
+            this.colHasAnomalies.HeaderText = "Has anomalies?";
+            this.colHasAnomalies.Name = "colHasAnomalies";
+            this.colHasAnomalies.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.colHasAnomalies.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // colIsUnique
+            // 
+            this.colIsUnique.HeaderText = "Is unique?";
+            this.colIsUnique.Name = "colIsUnique";
+            this.colIsUnique.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.colIsUnique.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             // 
             // groupBox2
             // 
@@ -199,6 +245,28 @@
             this.tbFilePath.Size = new System.Drawing.Size(343, 20);
             this.tbFilePath.TabIndex = 6;
             // 
+            // btnOpenFileDialog
+            // 
+            this.btnOpenFileDialog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnOpenFileDialog.Location = new System.Drawing.Point(552, 82);
+            this.btnOpenFileDialog.Name = "btnOpenFileDialog";
+            this.btnOpenFileDialog.Size = new System.Drawing.Size(194, 26);
+            this.btnOpenFileDialog.TabIndex = 7;
+            this.btnOpenFileDialog.Text = "Select file...";
+            this.btnOpenFileDialog.UseVisualStyleBackColor = true;
+            this.btnOpenFileDialog.Click += new System.EventHandler(this.btnOpenFileDialog_Click);
+            // 
+            // cbAllowOverwrite
+            // 
+            this.cbAllowOverwrite.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.cbAllowOverwrite.AutoSize = true;
+            this.cbAllowOverwrite.Location = new System.Drawing.Point(203, 118);
+            this.cbAllowOverwrite.Name = "cbAllowOverwrite";
+            this.cbAllowOverwrite.Size = new System.Drawing.Size(169, 17);
+            this.cbAllowOverwrite.TabIndex = 8;
+            this.cbAllowOverwrite.Text = "Allow overwrite to existing file?";
+            this.cbAllowOverwrite.UseVisualStyleBackColor = true;
+            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -228,77 +296,9 @@
             this.tsStatusDuration.Size = new System.Drawing.Size(199, 17);
             this.tsStatusDuration.Text = "Last session duration in milliseconds";
             // 
-            // btnOpenFileDialog
-            // 
-            this.btnOpenFileDialog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnOpenFileDialog.Location = new System.Drawing.Point(552, 82);
-            this.btnOpenFileDialog.Name = "btnOpenFileDialog";
-            this.btnOpenFileDialog.Size = new System.Drawing.Size(194, 26);
-            this.btnOpenFileDialog.TabIndex = 7;
-            this.btnOpenFileDialog.Text = "Select file...";
-            this.btnOpenFileDialog.UseVisualStyleBackColor = true;
-            this.btnOpenFileDialog.Click += new System.EventHandler(this.btnOpenFileDialog_Click);
-            // 
             // saveFileDialog1
             // 
             this.saveFileDialog1.FileName = "results.xlsx";
-            // 
-            // cbAllowOverwrite
-            // 
-            this.cbAllowOverwrite.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.cbAllowOverwrite.AutoSize = true;
-            this.cbAllowOverwrite.Location = new System.Drawing.Point(203, 118);
-            this.cbAllowOverwrite.Name = "cbAllowOverwrite";
-            this.cbAllowOverwrite.Size = new System.Drawing.Size(169, 17);
-            this.cbAllowOverwrite.TabIndex = 8;
-            this.cbAllowOverwrite.Text = "Allow overwrite to existing file?";
-            this.cbAllowOverwrite.UseVisualStyleBackColor = true;
-            // 
-            // colIsActive
-            // 
-            this.colIsActive.HeaderText = "Is active?";
-            this.colIsActive.Name = "colIsActive";
-            this.colIsActive.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.colIsActive.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            // 
-            // colDataClass
-            // 
-            this.colDataClass.HeaderText = "DataClass";
-            this.colDataClass.Name = "colDataClass";
-            // 
-            // colAllowedCharacters
-            // 
-            this.colAllowedCharacters.HeaderText = "Allowed characters";
-            this.colAllowedCharacters.Name = "colAllowedCharacters";
-            // 
-            // colAnomalyCharacters
-            // 
-            this.colAnomalyCharacters.HeaderText = "Anomaly characters";
-            this.colAnomalyCharacters.Name = "colAnomalyCharacters";
-            // 
-            // colMinLength
-            // 
-            this.colMinLength.HeaderText = "Minimum length / value";
-            this.colMinLength.Name = "colMinLength";
-            // 
-            // colMaxLength
-            // 
-            this.colMaxLength.HeaderText = "Maximum length / value";
-            this.colMaxLength.Name = "colMaxLength";
-            // 
-            // colHasAnomalies
-            // 
-            this.colHasAnomalies.HeaderText = "Has anomalies?";
-            this.colHasAnomalies.Name = "colHasAnomalies";
-            this.colHasAnomalies.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.colHasAnomalies.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            // 
-            // colIsUnique
-            // 
-            this.colIsUnique.HeaderText = "Is unique?";
-            this.colIsUnique.Name = "colIsUnique";
-            this.colIsUnique.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.colIsUnique.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             // 
             // Form1
             // 
