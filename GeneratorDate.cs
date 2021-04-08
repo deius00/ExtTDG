@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace ExtTDG
 {
-	public class GeneratorDate
-	{
+	public class GeneratorDate : IGenerator
+    {
         private int dateFormat = 0; 
         private string anomalyChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#¤%&()=?;:,_<>|@£${[]}"; 
         private DateTime minDate; 

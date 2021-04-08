@@ -13,7 +13,7 @@ namespace ExtTDG
 
         private enum DataClassType
         {
-            Name, Int32, Email, Date, Address, Phone, URL
+            Name, Int32, Email, Date, Address, Phone, URL, ID, String
         };
 
         // POD for generator parameters
@@ -23,8 +23,8 @@ namespace ExtTDG
             public string dataClassTypeName;    // DataClass type name
             public string allowedCharacters;
             public string anomalyCharacters;
-            public int minLength;               // Also minValue
-            public int maxLength;               // Also maxValue
+            public string minLength;            // Also minValue
+            public string maxLength;            // Also maxValue
             public bool hasAnomalies;
             public bool isUnique;
 
@@ -33,8 +33,8 @@ namespace ExtTDG
                 this.dataClassTypeName = null;
                 this.allowedCharacters = null;
                 this.anomalyCharacters = null;
-                this.minLength = 0;
-                this.maxLength = 0;
+                this.minLength = null;
+                this.maxLength = null;
                 this.hasAnomalies = false;
                 this.isUnique = false;
             }
@@ -160,9 +160,12 @@ namespace ExtTDG
                     {
                         case DataClassType.Name:
                             sw.Start();
-                            // Call generator here
-                            // NOTE: Placeholder insert
-                            generatorResults = new List<string>();
+                            GeneratorName generatorName = new GeneratorName(
+                                gp.allowedCharacters, gp.anomalyCharacters,
+                                gp.minLength, gp.maxLength,
+                                gp.hasAnomalies, gp.isUnique);
+
+                            generatorResults = generatorName.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
                             generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
                             allResults.Add(generatorResults);
@@ -170,9 +173,12 @@ namespace ExtTDG
 
                         case DataClassType.Int32:
                             sw.Start();
-                            // Call generator here
-                            // NOTE: Placeholder insert
-                            generatorResults = new List<string>();
+                            GeneratorInt32 generatorInt32 = new GeneratorInt32(
+                                gp.allowedCharacters, gp.anomalyCharacters,
+                                gp.minLength, gp.maxLength,
+                                gp.hasAnomalies, gp.isUnique);
+
+                            generatorResults = generatorInt32.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
                             generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
                             allResults.Add(generatorResults);
@@ -180,9 +186,12 @@ namespace ExtTDG
 
                         case DataClassType.Email:
                             sw.Start();
-                            // Call generator here
-                            // NOTE: Placeholder insert
-                            generatorResults = new List<string>();
+                            GeneratorEmail generatorEmail = new GeneratorEmail(
+                                gp.allowedCharacters, gp.anomalyCharacters,
+                                gp.minLength, gp.maxLength,
+                                gp.hasAnomalies, gp.isUnique);
+
+                            generatorResults = generatorEmail.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
                             generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
                             allResults.Add(generatorResults);
@@ -203,9 +212,12 @@ namespace ExtTDG
 
                         case DataClassType.Address:
                             sw.Start();
-                            // Call generator here
-                            // NOTE: Placeholder insert
-                            generatorResults = new List<string>();
+                            GeneratorAddress generatorAddress = new GeneratorAddress(
+                                gp.allowedCharacters, gp.anomalyCharacters,
+                                gp.minLength, gp.maxLength,
+                                gp.hasAnomalies, gp.isUnique);
+
+                            generatorResults = generatorAddress.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
                             generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
                             allResults.Add(generatorResults);
@@ -213,9 +225,12 @@ namespace ExtTDG
 
                         case DataClassType.Phone:
                             sw.Start();
-                            // Call generator here
-                            // NOTE: Placeholder insert
-                            generatorResults = new List<string>();
+                            GeneratorPhone generatorPhone = new GeneratorPhone(
+                                gp.allowedCharacters, gp.anomalyCharacters,
+                                gp.minLength, gp.maxLength,
+                                gp.hasAnomalies, gp.isUnique);
+
+                            generatorResults = generatorPhone.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
                             generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
                             allResults.Add(generatorResults);
@@ -225,10 +240,36 @@ namespace ExtTDG
                             sw.Start();
                             GeneratorURL generatorURL = new GeneratorURL(
                                 gp.allowedCharacters, gp.anomalyCharacters,
-                                gp.minLength.ToString(), gp.maxLength.ToString(),
+                                gp.minLength, gp.maxLength,
                                 gp.hasAnomalies, gp.isUnique);
 
                             generatorResults = generatorURL.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
+                            sw.Stop();
+                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
+                            allResults.Add(generatorResults);
+                            break;
+
+                        case DataClassType.ID:
+                            sw.Start();
+                            GeneratorID generatorID = new GeneratorID(
+                                gp.allowedCharacters, gp.anomalyCharacters,
+                                gp.minLength, gp.maxLength,
+                                gp.hasAnomalies, gp.isUnique);
+
+                            generatorResults = generatorID.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
+                            sw.Stop();
+                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
+                            allResults.Add(generatorResults);
+                            break;
+
+                        case DataClassType.String:
+                            sw.Start();
+                            GeneratorString generatorString = new GeneratorString(
+                                gp.allowedCharacters, gp.anomalyCharacters,
+                                gp.minLength, gp.maxLength,
+                                gp.hasAnomalies, gp.isUnique);
+
+                            generatorResults = generatorString.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
                             generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
                             allResults.Add(generatorResults);
@@ -245,7 +286,7 @@ namespace ExtTDG
                 PrintStats(generatorStats);
 
                 // Write results to Excel file
-                SaveResultsToFile(allResults);
+                SaveResultsToFile(allResults, generatorParameters);
                 Console.WriteLine("Done");
 
                 tsStatusLabel.Text = "Done.";
@@ -268,15 +309,15 @@ namespace ExtTDG
         // Populate data for DataGridView
         private void PopulateDataGridView()
         {
-            dgvGenerators.Rows.Add(7);
+            dgvGenerators.Rows.Add(9);
 
             // Default values for Name
             dgvGenerators.Rows[0].Cells[0].Value = true;
             dgvGenerators.Rows[0].Cells[1].Value = DataClassType.Name;
             dgvGenerators.Rows[0].Cells[2].Value = "abcdefghijklmnopqrustuvwxyz";
             dgvGenerators.Rows[0].Cells[3].Value = "!#()";
-            dgvGenerators.Rows[0].Cells[4].Value = 1;
-            dgvGenerators.Rows[0].Cells[5].Value = 5;
+            dgvGenerators.Rows[0].Cells[4].Value = "1";
+            dgvGenerators.Rows[0].Cells[5].Value = "5";
             dgvGenerators.Rows[0].Cells[6].Value = true;
             dgvGenerators.Rows[0].Cells[7].Value = true;
 
@@ -285,8 +326,8 @@ namespace ExtTDG
             dgvGenerators.Rows[1].Cells[1].Value = DataClassType.Int32;
             dgvGenerators.Rows[1].Cells[2].Value = "0123456789";
             dgvGenerators.Rows[1].Cells[3].Value = "-+";
-            dgvGenerators.Rows[1].Cells[4].Value = 1;
-            dgvGenerators.Rows[1].Cells[5].Value = 5;
+            dgvGenerators.Rows[1].Cells[4].Value = "1";
+            dgvGenerators.Rows[1].Cells[5].Value = "5";
             dgvGenerators.Rows[1].Cells[6].Value = true;
             dgvGenerators.Rows[1].Cells[7].Value = true;
 
@@ -295,28 +336,28 @@ namespace ExtTDG
             dgvGenerators.Rows[2].Cells[1].Value = DataClassType.Email;
             dgvGenerators.Rows[2].Cells[2].Value = "abcdefghijklmnopqrstuvwxyz1234567890";
             dgvGenerators.Rows[2].Cells[3].Value = "!/#[]";
-            dgvGenerators.Rows[2].Cells[4].Value = 3;
-            dgvGenerators.Rows[2].Cells[5].Value = 30;
+            dgvGenerators.Rows[2].Cells[4].Value = "3";
+            dgvGenerators.Rows[2].Cells[5].Value = "30";
             dgvGenerators.Rows[2].Cells[6].Value = true;
             dgvGenerators.Rows[2].Cells[7].Value = true;
 
             // Default values for Date
             dgvGenerators.Rows[3].Cells[0].Value = true;
             dgvGenerators.Rows[3].Cells[1].Value = DataClassType.Date;
-            dgvGenerators.Rows[3].Cells[2].Value = "0123456789";
-            dgvGenerators.Rows[3].Cells[3].Value = "abcdefghijklmnopqrstuvwxyz!";
-            dgvGenerators.Rows[3].Cells[4].Value = 1;
-            dgvGenerators.Rows[3].Cells[5].Value = 30;
+            dgvGenerators.Rows[3].Cells[2].Value = "0";
+            dgvGenerators.Rows[3].Cells[3].Value = "abcdefghijklmnopqrstuvwxyz-/.";
+            dgvGenerators.Rows[3].Cells[4].Value = "10000101";
+            dgvGenerators.Rows[3].Cells[5].Value = "99991231";
             dgvGenerators.Rows[3].Cells[6].Value = true;
             dgvGenerators.Rows[3].Cells[7].Value = true;
 
             // Default values for Address
             dgvGenerators.Rows[4].Cells[0].Value = true;
             dgvGenerators.Rows[4].Cells[1].Value = DataClassType.Address;
-            dgvGenerators.Rows[4].Cells[2].Value = "0123456789";
-            dgvGenerators.Rows[4].Cells[3].Value = "abcdefghijklmnopqrstuvwxyz!";
-            dgvGenerators.Rows[4].Cells[4].Value = 1;
-            dgvGenerators.Rows[4].Cells[5].Value = 30;
+            dgvGenerators.Rows[4].Cells[2].Value = "abcdefghijklmnopqrstuvwxyz";
+            dgvGenerators.Rows[4].Cells[3].Value = "!#&/";
+            dgvGenerators.Rows[4].Cells[4].Value = "0";
+            dgvGenerators.Rows[4].Cells[5].Value = "0";
             dgvGenerators.Rows[4].Cells[6].Value = true;
             dgvGenerators.Rows[4].Cells[7].Value = true;
 
@@ -325,8 +366,8 @@ namespace ExtTDG
             dgvGenerators.Rows[5].Cells[1].Value = DataClassType.Phone;
             dgvGenerators.Rows[5].Cells[2].Value = "0123456789";
             dgvGenerators.Rows[5].Cells[3].Value = "abcdefghijklmnopqrstuvwxyz!";
-            dgvGenerators.Rows[5].Cells[4].Value = 7;
-            dgvGenerators.Rows[5].Cells[5].Value = 30;
+            dgvGenerators.Rows[5].Cells[4].Value = "7";
+            dgvGenerators.Rows[5].Cells[5].Value = "30";
             dgvGenerators.Rows[5].Cells[6].Value = true;
             dgvGenerators.Rows[5].Cells[7].Value = true;
 
@@ -335,10 +376,30 @@ namespace ExtTDG
             dgvGenerators.Rows[6].Cells[1].Value = DataClassType.URL;
             dgvGenerators.Rows[6].Cells[2].Value = "abcdefghijklmnopqrstuvwxyz";
             dgvGenerators.Rows[6].Cells[3].Value = "!#()[]=";
-            dgvGenerators.Rows[6].Cells[4].Value = 7;
-            dgvGenerators.Rows[6].Cells[5].Value = 30;
+            dgvGenerators.Rows[6].Cells[4].Value = "7";
+            dgvGenerators.Rows[6].Cells[5].Value = "30";
             dgvGenerators.Rows[6].Cells[6].Value = true;
             dgvGenerators.Rows[6].Cells[7].Value = true;
+            
+            // Default values for Phone
+            dgvGenerators.Rows[7].Cells[0].Value = true;
+            dgvGenerators.Rows[7].Cells[1].Value = DataClassType.ID;
+            dgvGenerators.Rows[7].Cells[2].Value = "0123456789";
+            dgvGenerators.Rows[7].Cells[3].Value = "abcdefghijklmnopqrstuvwxyz!";
+            dgvGenerators.Rows[7].Cells[4].Value = "3";
+            dgvGenerators.Rows[7].Cells[5].Value = "6";
+            dgvGenerators.Rows[7].Cells[6].Value = true;
+            dgvGenerators.Rows[7].Cells[7].Value = true;
+
+            // Default values for URL
+            dgvGenerators.Rows[8].Cells[0].Value = true;
+            dgvGenerators.Rows[8].Cells[1].Value = DataClassType.String;
+            dgvGenerators.Rows[8].Cells[2].Value = "abcdefghijklmnopqrstuvwxyz";
+            dgvGenerators.Rows[8].Cells[3].Value = "!#()[]=";
+            dgvGenerators.Rows[8].Cells[4].Value = "1";
+            dgvGenerators.Rows[8].Cells[5].Value = "10";
+            dgvGenerators.Rows[8].Cells[6].Value = true;
+            dgvGenerators.Rows[8].Cells[7].Value = true;
         }
 
         // Parse data for each row in DataGridView and return list of selected
@@ -360,8 +421,8 @@ namespace ExtTDG
                     gp.anomalyCharacters = (string)row.Cells[3].Value;
 
                     // Try to parse minimum and maximum length
-                    int.TryParse(row.Cells[4].Value.ToString(), out gp.minLength);
-                    int.TryParse(row.Cells[5].Value.ToString(), out gp.maxLength);
+                    gp.minLength = row.Cells[4].Value.ToString();
+                    gp.maxLength = row.Cells[5].Value.ToString();
 
                     gp.hasAnomalies = (bool)row.Cells[6].Value;
                     gp.isUnique = (bool)row.Cells[7].Value;
@@ -407,7 +468,7 @@ namespace ExtTDG
             return totalDurationInMilliseconds;
         }
 
-        private void SaveResultsToFile(List<List<string>> results)
+        private void SaveResultsToFile(List<List<string>> results, List<GeneratorParameters> gp)
         {
             object Nothing = System.Reflection.Missing.Value;
             Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
@@ -421,9 +482,11 @@ namespace ExtTDG
             for (int colIndex = 0; colIndex < results.Count; colIndex++)
             {
                 List<string> rows = results[colIndex];
+                workSheet.Cells[1, colIndex + 1] = gp[colIndex].dataClassTypeName;
+
                 for (int rowIndex = 0; rowIndex < results[colIndex].Count; rowIndex++)
                 {
-                    workSheet.Cells[rowIndex + 1, colIndex + 1] = rows[rowIndex];
+                    workSheet.Cells[rowIndex + 2, colIndex + 1] = rows[rowIndex];
                 }
             }
 

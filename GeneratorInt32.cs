@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
 namespace ExtTDG
 {
-	public class GeneratorURL : IGenerator
+    public class GeneratorInt32 : IGenerator
 	{
 		private string allowedChars;
 		private string anomalyChars;
@@ -13,7 +12,9 @@ namespace ExtTDG
 		private bool hasAnomalies;
 		private bool isUnique;
 
-		public GeneratorURL(string allowedChars, string anomalyChars,
+		// TODO: Janne
+
+		public GeneratorInt32(string allowedChars, string anomalyChars,
 				string minValue, string maxValue, bool hasAnomalies, bool isUnique)
 		{
 			this.allowedChars = allowedChars;

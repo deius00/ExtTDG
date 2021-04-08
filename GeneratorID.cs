@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ExtTDG
 {
-    class GeneratorID
+    class GeneratorID  : IGenerator
     {
         private string allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         private string anomalyChars = "!#¤%&()=?/;.:,_-<>|@£${[]}*";

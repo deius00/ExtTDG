@@ -66,7 +66,7 @@
             this.groupBox1.Controls.Add(this.dgvGenerators);
             this.groupBox1.Location = new System.Drawing.Point(3, 3);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(862, 235);
+            this.groupBox1.Size = new System.Drawing.Size(862, 272);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Generators";
@@ -92,7 +92,7 @@
             this.dgvGenerators.Name = "dgvGenerators";
             this.dgvGenerators.RowHeadersVisible = false;
             this.dgvGenerators.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dgvGenerators.Size = new System.Drawing.Size(856, 216);
+            this.dgvGenerators.Size = new System.Drawing.Size(856, 253);
             this.dgvGenerators.TabIndex = 0;
             // 
             // colIsActive
@@ -144,7 +144,7 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.tableLayoutPanel1);
-            this.groupBox2.Location = new System.Drawing.Point(3, 241);
+            this.groupBox2.Location = new System.Drawing.Point(3, 281);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(755, 217);
             this.groupBox2.TabIndex = 1;
@@ -273,7 +273,7 @@
             this.tsStatusLabel,
             this.tsProgressBar,
             this.tsStatusDuration});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 537);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 547);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(886, 22);
             this.statusStrip1.TabIndex = 2;
@@ -304,7 +304,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(886, 559);
+            this.ClientSize = new System.Drawing.Size(886, 569);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
