@@ -76,12 +76,12 @@ namespace ExtTDG
             {
                anom.Remove(c);
             }
-            foreach (char c in lett)
+            foreach (char c in this.letters)
             {
                 if (!allowed.Contains(c))
                     lett.Remove(c);
             }
-            foreach (char c in num)
+            foreach (char c in this.numbers)
             {
                 if (!allowed.Contains(c))
                     num.Remove(c);
@@ -126,7 +126,12 @@ namespace ExtTDG
                 this.anomalyChars = "!#¤%&()=?/;.:,_-<>|@£${[]}*";
                 this.letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
                 this.numbers = "0123456789";
+                Console.WriteLine("");
             }
+
+            // Increase max length if trying to generate too many unique but short IDs
+            if (Math.Log(2 * numItems, this.allowedChars.Length) > this.maxLength)
+                this.maxLength = 2 * (int)Math.Log(2 * numItems, this.allowedChars.Length);
 
             // Generate IDs
             string str;

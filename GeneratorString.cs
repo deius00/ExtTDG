@@ -74,6 +74,18 @@ namespace ExtTDG
                 anomalyProb = 0;
             }
 
+            // Revert to default allowed chars if trying to generate too much unique Strings with to few chars.
+            if (this.uniqueStrings && this.allowedChars.Length < 10 && numItems > 1000000)
+            {
+                this.allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                this.anomalyChars = "!#¤%&()=?/;.:,_-<>|@£${[]}*";
+                Console.WriteLine("");
+            }
+
+            // Increase max length if trying to generate too many unique but short Strings
+            if (Math.Log(2 * numItems, this.allowedChars.Length) > this.maxLength)
+                this.maxLength = 2 * (int)Math.Log(2 * numItems, this.allowedChars.Length);
+
             string str;
             for (int i = 0; i < numItems; i++)
             {
