@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
-using System.Threading;
 using System.ComponentModel;
-using System.Data;
+using ExcelApplication = Microsoft.Office.Interop.Excel.Application;
+using ExcelWorkbook = Microsoft.Office.Interop.Excel.Workbook;
+using ExcelWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
+using ExcelRange = Microsoft.Office.Interop.Excel.Range;
 
 namespace ExtTDG
 {
@@ -405,33 +407,40 @@ namespace ExtTDG
             return totalDurationInMilliseconds;
         }
 
-        //private void SaveResultsToFile(List<List<string>> results, List<GeneratorParameters> gp)
         private void SaveResultsToFile()
         {
-
-
             object Nothing = System.Reflection.Missing.Value;
-            Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
+            ExcelApplication app = new ExcelApplication();
             app.Visible = false;
             app.DisplayAlerts = false;
-            Microsoft.Office.Interop.Excel.Workbook workBook = app.Workbooks.Add(Nothing);
-            Microsoft.Office.Interop.Excel.Worksheet workSheet = workBook.Sheets[1];
+            ExcelWorkbook workBook = app.Workbooks.Add(Nothing);
+            ExcelWorksheet workSheet = workBook.Sheets[1];
             workSheet.Name = "Results";
 
-            // Write all results to file
-            for (int colIndex = 0; colIndex < m_allResults.Count; colIndex++)
+            // Convert each generator results to array and write it in one go
+            int numColumns = m_allResults.Count;
+            int numRows = m_allResults[0].Count;
+            object[,] arr = new object[numRows, numColumns];
+
+            for (int colIndex = 0; colIndex < numColumns; colIndex++)
             {
-                List<string> columns = m_allResults[colIndex];
-                
-                // Write header to first cell in each column
-                workSheet.Cells[1, colIndex + 1] = m_generatorParameters[colIndex].dataClassTypeName.ToString();
-                for (int rowIndex = 0; rowIndex < columns.Count; rowIndex++)
+                List<string> rows = m_allResults[colIndex];
+                for (int rowIndex = 0; rowIndex < numRows; rowIndex++)
                 {
-                    if(columns[rowIndex] != null)
-                    {
-                        workSheet.Cells[2 + rowIndex, colIndex + 1] = columns[rowIndex].ToString();
-                    }
+                    arr[rowIndex, colIndex] = rows[rowIndex];
                 }
+            }
+
+            int topRow = 2;
+            ExcelRange cellStart = workSheet.Cells[topRow, 1];
+            ExcelRange cellEnd = workSheet.Cells[topRow + numRows - 1, numColumns];
+            ExcelRange selectedRange = workSheet.Range[cellStart, cellEnd];
+            selectedRange.Value = arr;
+
+            // Write headers to columns
+            for(int i = 0; i < m_allResults.Count; i++)
+            {
+                workSheet.Cells[1, 1 + i] = m_generatorParameters[i].dataClassTypeName;
             }
 
             workSheet.SaveAs(tbFilePath.Text, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, Type.Missing);
@@ -473,19 +482,6 @@ namespace ExtTDG
         }
 
         // Ask result file location from user
-        private void btnSelectResultLocation_Click(object sender, EventArgs e)
-        {
-            saveFileDialog1.Filter = "Excel file|*.xlsx";
-            saveFileDialog1.Title = "Save results to Excel-file:";
-            DialogResult result = saveFileDialog1.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                string filePath = saveFileDialog1.FileName;
-                tbFilePath.Text = filePath;
-                m_isFileSelected = true;
-            }
-        }
-
         private void btnOpenFileDialog_Click(object sender, EventArgs e)
         {
             saveFileDialog1.Filter = "Excel file|*.xlsx";
@@ -499,10 +495,10 @@ namespace ExtTDG
             }
         }
 
+        // Start background worker to save results to file
         private void StartBackgroundWork(object sender, DoWorkEventArgs e)
         {
             // TODO: Selvitä, miten kirjoittaa Excel-tiedostoon nopeammin! Nyt on ihan PERKULEEN hidas! :D
-            // Write results to Excel file
             Stopwatch sw = new Stopwatch();
             sw.Start();
             SaveResultsToFile();
