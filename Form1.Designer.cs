@@ -30,6 +30,14 @@
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.dgvGenerators = new System.Windows.Forms.DataGridView();
+            this.colIsActive = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.colDataClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAllowedCharacters = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAnomalyCharacters = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMinLength = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMaxLength = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colHasAnomalies = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.colIsUnique = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
@@ -46,14 +54,6 @@
             this.tsProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.tsStatusDuration = new System.Windows.Forms.ToolStripStatusLabel();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.colIsActive = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.colDataClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colAllowedCharacters = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colAnomalyCharacters = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMinLength = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMaxLength = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colHasAnomalies = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.colIsUnique = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvGenerators)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -94,6 +94,53 @@
             this.dgvGenerators.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dgvGenerators.Size = new System.Drawing.Size(856, 253);
             this.dgvGenerators.TabIndex = 0;
+            // 
+            // colIsActive
+            // 
+            this.colIsActive.HeaderText = "Is active?";
+            this.colIsActive.Name = "colIsActive";
+            this.colIsActive.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.colIsActive.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // colDataClass
+            // 
+            this.colDataClass.HeaderText = "DataClass";
+            this.colDataClass.Name = "colDataClass";
+            this.colDataClass.ReadOnly = true;
+            // 
+            // colAllowedCharacters
+            // 
+            this.colAllowedCharacters.HeaderText = "Allowed characters";
+            this.colAllowedCharacters.Name = "colAllowedCharacters";
+            // 
+            // colAnomalyCharacters
+            // 
+            this.colAnomalyCharacters.HeaderText = "Anomaly characters";
+            this.colAnomalyCharacters.Name = "colAnomalyCharacters";
+            // 
+            // colMinLength
+            // 
+            this.colMinLength.HeaderText = "Minimum length / value";
+            this.colMinLength.Name = "colMinLength";
+            // 
+            // colMaxLength
+            // 
+            this.colMaxLength.HeaderText = "Maximum length / value";
+            this.colMaxLength.Name = "colMaxLength";
+            // 
+            // colHasAnomalies
+            // 
+            this.colHasAnomalies.HeaderText = "Has anomalies?";
+            this.colHasAnomalies.Name = "colHasAnomalies";
+            this.colHasAnomalies.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.colHasAnomalies.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // colIsUnique
+            // 
+            this.colIsUnique.HeaderText = "Is unique?";
+            this.colIsUnique.Name = "colIsUnique";
+            this.colIsUnique.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.colIsUnique.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             // 
             // groupBox2
             // 
@@ -253,53 +300,6 @@
             // saveFileDialog1
             // 
             this.saveFileDialog1.FileName = "results.xlsx";
-            // 
-            // colIsActive
-            // 
-            this.colIsActive.HeaderText = "Is active?";
-            this.colIsActive.Name = "colIsActive";
-            this.colIsActive.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.colIsActive.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            // 
-            // colDataClass
-            // 
-            this.colDataClass.HeaderText = "DataClass";
-            this.colDataClass.Name = "colDataClass";
-            this.colDataClass.ReadOnly = true;
-            // 
-            // colAllowedCharacters
-            // 
-            this.colAllowedCharacters.HeaderText = "Allowed characters";
-            this.colAllowedCharacters.Name = "colAllowedCharacters";
-            // 
-            // colAnomalyCharacters
-            // 
-            this.colAnomalyCharacters.HeaderText = "Anomaly characters";
-            this.colAnomalyCharacters.Name = "colAnomalyCharacters";
-            // 
-            // colMinLength
-            // 
-            this.colMinLength.HeaderText = "Minimum length / value";
-            this.colMinLength.Name = "colMinLength";
-            // 
-            // colMaxLength
-            // 
-            this.colMaxLength.HeaderText = "Maximum length / value";
-            this.colMaxLength.Name = "colMaxLength";
-            // 
-            // colHasAnomalies
-            // 
-            this.colHasAnomalies.HeaderText = "Has anomalies?";
-            this.colHasAnomalies.Name = "colHasAnomalies";
-            this.colHasAnomalies.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.colHasAnomalies.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            // 
-            // colIsUnique
-            // 
-            this.colIsUnique.HeaderText = "Is unique?";
-            this.colIsUnique.Name = "colIsUnique";
-            this.colIsUnique.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.colIsUnique.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             // 
             // Form1
             // 
