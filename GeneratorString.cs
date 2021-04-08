@@ -25,7 +25,7 @@ namespace ExtTDG
             }
             for (int i = 0; i < this.allowedChars.Length; i++)
             {
-                this.anomalyChars.Replace(this.allowedChars[i].ToString(), "");
+                this.anomalyChars = this.anomalyChars.Replace(this.allowedChars[i].ToString(), "");
             }
             if (this.anomalyChars.Length == 0)
             {
