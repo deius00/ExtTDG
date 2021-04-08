@@ -285,12 +285,16 @@ namespace ExtTDG
                 // Display running times
                 PrintStats(generatorStats);
 
+                // TODO: Selvitä, miten kirjoittaa Excel-tiedostoon nopeammin! Nyt on ihan PERKULEEN hidas! :D
                 // Write results to Excel file
+                Stopwatch swFile = new Stopwatch();
+                swFile.Start();
                 SaveResultsToFile(allResults, generatorParameters);
-                Console.WriteLine("Done");
+                swFile.Stop();
 
                 tsStatusLabel.Text = "Done.";
-                tsStatusDuration.Text = "Completed in " + GetTotalDurationInMilliseconds(generatorStats) + " ms";
+                tsStatusDuration.Text = "Completed in " + GetTotalDurationInMilliseconds(generatorStats) + " ms"
+                    + ", writing to file took " + swFile.ElapsedMilliseconds + " ms";
             }
 
             // Show error message to user at the end
