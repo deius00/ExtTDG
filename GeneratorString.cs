@@ -57,7 +57,7 @@ namespace ExtTDG
             }
             catch (Exception e)
             {
-                this.maxLength = 1;
+                this.maxLength = 10;
             }
             this.hasAnomalies = hasAnomalies;
             this.uniqueStrings = isUnique;
@@ -79,12 +79,15 @@ namespace ExtTDG
             {
                 this.allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
                 this.anomalyChars = "!#¤%&()=?/;.:,_-<>|@£${[]}*";
-                Console.WriteLine("");
+                Console.WriteLine("Too few allowed characters and large amount of unique Strings. Reverting to default allowed characters.");
             }
 
             // Increase max length if trying to generate too many unique but short Strings
             if (Math.Log(2 * numItems, this.allowedChars.Length) > this.maxLength)
+            { 
                 this.maxLength = 2 * (int)Math.Log(2 * numItems, this.allowedChars.Length);
+                Console.WriteLine("Too much unique but short Strings. Maximum length of the Strings increased to " + this.maxLength.ToString());
+            }
 
             string str;
             for (int i = 0; i < numItems; i++)
@@ -94,7 +97,7 @@ namespace ExtTDG
                     str = GenerateOneString(true, rng);
                 } else
                 {
-                    str = GenerateOneString(true, rng);
+                    str = GenerateOneString(false, rng);
                 }
 
                 if (!this.uniqueStrings || !alreadyGenerated.Contains(str))
@@ -132,8 +135,8 @@ namespace ExtTDG
                 for (int k = 0; k < errsAmount; k++)
                 {
                     ind = rng.Next(str.Length);
-                    str.Remove(ind, 1);
-                    str.Insert(ind, this.anomalyChars[rng.Next(this.anomalyChars.Length)].ToString());
+                    str = str.Remove(ind, 1);
+                    str = str.Insert(ind, this.anomalyChars[rng.Next(this.anomalyChars.Length)].ToString());
                 }
             }
 

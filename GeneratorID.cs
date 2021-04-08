@@ -49,7 +49,7 @@ namespace ExtTDG
             }
             catch (Exception e)
             {
-                this.maxLength = 1;
+                this.maxLength = 6;
             }
             this.hasAnomalies = hasAnomalies;
             this.uniqueStrings = isUnique;
@@ -126,12 +126,15 @@ namespace ExtTDG
                 this.anomalyChars = "!#¤%&()=?/;.:,_-<>|@£${[]}*";
                 this.letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
                 this.numbers = "0123456789";
-                Console.WriteLine("");
+                Console.WriteLine("Too few allowed characters and large amount of unique IDs. Reverting to default allowed characters.");
             }
 
             // Increase max length if trying to generate too many unique but short IDs
             if (Math.Log(2 * numItems, this.allowedChars.Length) > this.maxLength)
+            {
                 this.maxLength = 2 * (int)Math.Log(2 * numItems, this.allowedChars.Length);
+                Console.WriteLine("Too much unique but short IDs. Maximum length of the ID increased to " + this.maxLength.ToString());
+            }
 
             // Generate IDs
             string str;
@@ -143,7 +146,7 @@ namespace ExtTDG
                 }
                 else
                 {
-                    str = GenerateOneID(true, rng);
+                    str = GenerateOneID(false, rng);
                 }
 
                 if (!this.uniqueStrings || !alreadyGenerated.Contains(str))
@@ -198,8 +201,8 @@ namespace ExtTDG
                 for (int k = 0; k < errsAmount; k++)
                 {
                     ind = rng.Next(id.Length);
-                    id.Remove(ind, 1);
-                    id.Insert(ind, this.anomalyChars[rng.Next(this.anomalyChars.Length)].ToString());
+                    id = id.Remove(ind, 1);
+                    id = id.Insert(ind, this.anomalyChars[rng.Next(this.anomalyChars.Length)].ToString());
                 }
             }
 
