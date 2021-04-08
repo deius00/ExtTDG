@@ -50,15 +50,10 @@ namespace ExtTDG
                 durationInMilliseconds = 0;
             }
 
-            public GeneratorStats(long durationInMilliseconds)
-            {
-                this.durationInMilliseconds = durationInMilliseconds;
-            }
-
-            public GeneratorStats(DataClassType type, Stopwatch sw)
+            public GeneratorStats(DataClassType type, long durationInMilliseconds)
             {
                 this.type = type;
-                this.durationInMilliseconds = sw.ElapsedMilliseconds;
+                this.durationInMilliseconds = durationInMilliseconds;
             }
         }
 
@@ -159,6 +154,7 @@ namespace ExtTDG
                     switch (gp.dataClassType)
                     {
                         case DataClassType.Name:
+                            sw.Reset();
                             sw.Start();
                             GeneratorName generatorName = new GeneratorName(
                                 gp.allowedCharacters, gp.anomalyCharacters,
@@ -167,11 +163,12 @@ namespace ExtTDG
 
                             generatorResults = generatorName.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
+                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
                             allResults.Add(generatorResults);
                             break;
 
                         case DataClassType.Int32:
+                            sw.Reset();
                             sw.Start();
                             GeneratorInt32 generatorInt32 = new GeneratorInt32(
                                 gp.allowedCharacters, gp.anomalyCharacters,
@@ -180,11 +177,12 @@ namespace ExtTDG
 
                             generatorResults = generatorInt32.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
+                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
                             allResults.Add(generatorResults);
                             break;
 
                         case DataClassType.Email:
+                            sw.Reset();
                             sw.Start();
                             GeneratorEmail generatorEmail = new GeneratorEmail(
                                 gp.allowedCharacters, gp.anomalyCharacters,
@@ -193,11 +191,12 @@ namespace ExtTDG
 
                             generatorResults = generatorEmail.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
+                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
                             allResults.Add(generatorResults);
                             break;
 
                         case DataClassType.Date:
+                            sw.Reset();
                             sw.Start();
                             GeneratorDate generatorDate = new GeneratorDate(
                                 gp.allowedCharacters, gp.anomalyCharacters,
@@ -206,11 +205,12 @@ namespace ExtTDG
 
                             generatorResults = generatorDate.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
+                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
                             allResults.Add(generatorResults);
                             break;
 
                         case DataClassType.Address:
+                            sw.Reset();
                             sw.Start();
                             GeneratorAddress generatorAddress = new GeneratorAddress(
                                 gp.allowedCharacters, gp.anomalyCharacters,
@@ -219,11 +219,12 @@ namespace ExtTDG
 
                             generatorResults = generatorAddress.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
+                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
                             allResults.Add(generatorResults);
                             break;
 
                         case DataClassType.Phone:
+                            sw.Reset();
                             sw.Start();
                             GeneratorPhone generatorPhone = new GeneratorPhone(
                                 gp.allowedCharacters, gp.anomalyCharacters,
@@ -232,11 +233,12 @@ namespace ExtTDG
 
                             generatorResults = generatorPhone.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
+                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
                             allResults.Add(generatorResults);
                             break;
 
                         case DataClassType.URL:
+                            sw.Reset();
                             sw.Start();
                             GeneratorURL generatorURL = new GeneratorURL(
                                 gp.allowedCharacters, gp.anomalyCharacters,
@@ -245,11 +247,12 @@ namespace ExtTDG
 
                             generatorResults = generatorURL.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
+                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
                             allResults.Add(generatorResults);
                             break;
 
                         case DataClassType.ID:
+                            sw.Reset();
                             sw.Start();
                             GeneratorID generatorID = new GeneratorID(
                                 gp.allowedCharacters, gp.anomalyCharacters,
@@ -258,11 +261,12 @@ namespace ExtTDG
 
                             generatorResults = generatorID.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
+                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
                             allResults.Add(generatorResults);
                             break;
 
                         case DataClassType.String:
+                            sw.Reset();
                             sw.Start();
                             GeneratorString generatorString = new GeneratorString(
                                 gp.allowedCharacters, gp.anomalyCharacters,
@@ -271,7 +275,7 @@ namespace ExtTDG
 
                             generatorResults = generatorString.Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                             sw.Stop();
-                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw));
+                            generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
                             allResults.Add(generatorResults);
                             break;
 
@@ -331,7 +335,7 @@ namespace ExtTDG
             dgvGenerators.Rows[1].Cells[2].Value = "0123456789";
             dgvGenerators.Rows[1].Cells[3].Value = "-+";
             dgvGenerators.Rows[1].Cells[4].Value = "1";
-            dgvGenerators.Rows[1].Cells[5].Value = "5";
+            dgvGenerators.Rows[1].Cells[5].Value = "99999";
             dgvGenerators.Rows[1].Cells[6].Value = true;
             dgvGenerators.Rows[1].Cells[7].Value = true;
 
@@ -490,6 +494,7 @@ namespace ExtTDG
 
                 for (int rowIndex = 0; rowIndex < results[colIndex].Count; rowIndex++)
                 {
+                    // TODO: Crashes sometimes on third sequential run, maybe COM objects or GC must be called? -Janne
                     workSheet.Cells[rowIndex + 2, colIndex + 1] = rows[rowIndex];
                 }
             }

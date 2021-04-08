@@ -26,11 +26,29 @@ namespace ExtTDG
 
 		public List<string> Generate(int numItems, double anomalyChance, Random rng)
 		{
-			HashSet<string> alreadyGeneratedStrings = new HashSet<string>();
-			List<string> results = new List<string>();
-
 			string[] prefixes = new string[1] { "http://www." };
 			string[] suffixes = new string[3] { ".net", ".com", ".fi" };
+
+			HashSet<string> alreadyGeneratedStrings = new HashSet<string>();
+			List<string> results = new List<string>();
+			List<int> itemIndicesWithAnomalies = new List<int>();
+
+			// Get count of items with anomalies and push to indices
+			// to list
+			if(hasAnomalies)
+            {
+				HashSet<int> usedItemIndices = new HashSet<int>();
+				int numAnomalies = (int)((float)numItems * anomalyChance);
+				while(itemIndicesWithAnomalies.Count < numAnomalies)
+                {
+					int newIndex = rng.Next(0, numItems);
+					if(!usedItemIndices.Contains(newIndex))
+                    {
+						usedItemIndices.Add(newIndex);
+						itemIndicesWithAnomalies.Add(newIndex);
+                    }
+				}
+			}
 
 			int currentItemIndex = 0;
 			while (results.Count < numItems)
@@ -40,8 +58,13 @@ namespace ExtTDG
 					allowedChars, anomalyChars,
 					hasAnomalies, isUnique, rng);
 				string suffix = GenerateSuffix(rng, suffixes);
-
 				string newItem = prefix + body + suffix;
+
+				if (itemIndicesWithAnomalies.Contains(currentItemIndex))
+				{
+					newItem = GenerateAnomaly(newItem, rng);
+				}
+
 				if (isUnique)
 				{
 					if (!alreadyGeneratedStrings.Contains(newItem))
@@ -53,6 +76,7 @@ namespace ExtTDG
 				}
 				else
 				{
+
 					results.Add(newItem);
 					currentItemIndex++;
 				}
@@ -84,5 +108,13 @@ namespace ExtTDG
 		{
 			return suffixes[rng.Next(0, suffixes.Length)];
 		}
+
+		private string GenerateAnomaly(string item, Random rng)
+        {
+			char[] itemAsChars = item.ToCharArray();
+			int indexWithAnomaly = rng.Next(0, item.Length);
+			itemAsChars[indexWithAnomaly] = anomalyChars[rng.Next(0, anomalyChars.Length)];
+			return new string(itemAsChars);
+       }
 	}
 }
