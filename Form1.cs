@@ -424,6 +424,7 @@ namespace ExtTDG
             ExcelRange cellStart = workSheet.Cells[topRow, 1];
             ExcelRange cellEnd = workSheet.Cells[topRow + numRows - 1, numColumns];
             ExcelRange selectedRange = workSheet.Range[cellStart, cellEnd];
+            selectedRange.NumberFormat = "@";
             selectedRange.Value = arr;
 
             // Write headers to columns
