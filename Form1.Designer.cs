@@ -53,11 +53,14 @@
             this.tsProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.tsStatusDuration = new System.Windows.Forms.ToolStripStatusLabel();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.tbLogs = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvGenerators)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -146,7 +149,7 @@
             this.groupBox2.Controls.Add(this.tableLayoutPanel1);
             this.groupBox2.Location = new System.Drawing.Point(3, 281);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(755, 217);
+            this.groupBox2.Size = new System.Drawing.Size(636, 217);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Session parameters";
@@ -156,7 +159,7 @@
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 124F));
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.label2, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.label3, 0, 2);
@@ -175,7 +178,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 55F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(749, 198);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(630, 198);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // label1
@@ -224,7 +227,7 @@
             this.tbNumItems.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbNumItems.Location = new System.Drawing.Point(203, 3);
             this.tbNumItems.Name = "tbNumItems";
-            this.tbNumItems.Size = new System.Drawing.Size(343, 20);
+            this.tbNumItems.Size = new System.Drawing.Size(300, 20);
             this.tbNumItems.TabIndex = 4;
             this.tbNumItems.Text = "1000";
             // 
@@ -233,7 +236,7 @@
             this.tbAnomalyChance.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbAnomalyChance.Location = new System.Drawing.Point(203, 45);
             this.tbAnomalyChance.Name = "tbAnomalyChance";
-            this.tbAnomalyChance.Size = new System.Drawing.Size(343, 20);
+            this.tbAnomalyChance.Size = new System.Drawing.Size(300, 20);
             this.tbAnomalyChance.TabIndex = 5;
             this.tbAnomalyChance.Text = "0,1";
             // 
@@ -242,15 +245,15 @@
             this.tbFilePath.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbFilePath.Location = new System.Drawing.Point(203, 82);
             this.tbFilePath.Name = "tbFilePath";
-            this.tbFilePath.Size = new System.Drawing.Size(343, 20);
+            this.tbFilePath.Size = new System.Drawing.Size(300, 20);
             this.tbFilePath.TabIndex = 6;
             // 
             // btnOpenFileDialog
             // 
             this.btnOpenFileDialog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnOpenFileDialog.Location = new System.Drawing.Point(552, 82);
+            this.btnOpenFileDialog.Location = new System.Drawing.Point(509, 82);
             this.btnOpenFileDialog.Name = "btnOpenFileDialog";
-            this.btnOpenFileDialog.Size = new System.Drawing.Size(194, 26);
+            this.btnOpenFileDialog.Size = new System.Drawing.Size(118, 26);
             this.btnOpenFileDialog.TabIndex = 7;
             this.btnOpenFileDialog.Text = "Select file...";
             this.btnOpenFileDialog.UseVisualStyleBackColor = true;
@@ -272,7 +275,7 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsProgressBar,
             this.tsStatusDuration});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 547);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 506);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(886, 22);
             this.statusStrip1.TabIndex = 2;
@@ -293,11 +296,31 @@
             // 
             this.saveFileDialog1.FileName = "results.xlsx";
             // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.tbLogs);
+            this.groupBox3.Location = new System.Drawing.Point(642, 281);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(217, 217);
+            this.groupBox3.TabIndex = 3;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Logs";
+            // 
+            // tbLogs
+            // 
+            this.tbLogs.Location = new System.Drawing.Point(6, 16);
+            this.tbLogs.Multiline = true;
+            this.tbLogs.Name = "tbLogs";
+            this.tbLogs.ReadOnly = true;
+            this.tbLogs.Size = new System.Drawing.Size(205, 195);
+            this.tbLogs.TabIndex = 0;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(886, 569);
+            this.ClientSize = new System.Drawing.Size(886, 528);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -311,6 +334,8 @@
             this.tableLayoutPanel1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -343,6 +368,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colMaxLength;
         private System.Windows.Forms.DataGridViewCheckBoxColumn colHasAnomalies;
         private System.Windows.Forms.DataGridViewCheckBoxColumn colIsUnique;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.TextBox tbLogs;
     }
 }
 

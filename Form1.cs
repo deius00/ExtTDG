@@ -8,23 +8,20 @@ using ExcelApplication = Microsoft.Office.Interop.Excel.Application;
 using ExcelWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 using ExcelWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
 using ExcelRange = Microsoft.Office.Interop.Excel.Range;
+using BackgroundWorker = System.ComponentModel.BackgroundWorker;
 
 namespace ExtTDG
 {
     public partial class Form1 : Form
     {
-        private Dictionary<DataClassType, IGenerator> generatorTypes= new Dictionary<DataClassType, IGenerator>();
-        private bool m_isFileSelected = false;
-        private bool m_allowOverwrite = false;
-
-        private List<List<string>> m_allResults = new List<List<string>>();
+        private Dictionary<DataClassType, IGenerator> generatorTypes = new Dictionary<DataClassType, IGenerator>();
         private List<GeneratorParameters> m_generatorParameters = new List<GeneratorParameters>();
         private List<GeneratorStats> m_generatorStats = new List<GeneratorStats>();
-        private long m_generationDuration;
-        private long m_fileWriteDuration;
-
-        // Background workers
-        private System.ComponentModel.BackgroundWorker m_worker = new System.ComponentModel.BackgroundWorker();
+        private List<List<string>> m_allResults = new List<List<string>>();
+        private long m_generationDuration = 0;
+        private long m_fileWriteDuration = 0;
+        private bool m_isFileSelected = false;
+        private BackgroundWorker m_worker = new BackgroundWorker();
 
         private enum DataClassType
         {
@@ -159,8 +156,9 @@ namespace ExtTDG
                 tsProgressBar.Step = 1;
                 tsProgressBar.Value = 0;
 
-                // Reset toolstrip status text
+                // Reset toolstrip status text and logs
                 tsStatusDuration.Text = "Generating...";
+                tbLogs.Text = "";
 
                 // Cache generators key-value-pairs used in this session
                 foreach (GeneratorParameters gp in m_generatorParameters)
@@ -220,8 +218,12 @@ namespace ExtTDG
                     tsProgressBar.PerformStep();
                 }
 
-                // Display running times
-                PrintStats(m_generatorStats);
+                // Log running times
+                foreach(GeneratorStats gs in m_generatorStats)
+                {
+                    tbLogs.Text += "Generator" + gs.type.ToString() + " duration: " + gs.durationInMilliseconds + " ms" + "\r\n";
+                }
+
                 m_generationDuration = GetTotalDurationInMilliseconds(m_generatorStats);
 
                 // Start background worker for saving results to file
@@ -384,18 +386,6 @@ namespace ExtTDG
             return rp;
         }
 
-        private void PrintStats(List<GeneratorStats> stats)
-        {
-            long totalRunningTimeMilliseconds = 0;
-            foreach (GeneratorStats gs in stats)
-            {
-                Console.WriteLine(gs.type.ToString() + " gen: " + gs.durationInMilliseconds + " ms");
-                totalRunningTimeMilliseconds += gs.durationInMilliseconds;
-            }
-
-            Console.WriteLine("Total running time: " + totalRunningTimeMilliseconds + " ms");
-        }
-
         private long GetTotalDurationInMilliseconds(List<GeneratorStats> stats)
         {
             long totalDurationInMilliseconds = 0;
@@ -497,7 +487,6 @@ namespace ExtTDG
         // Start background worker to save results to file
         private void StartBackgroundWork(object sender, DoWorkEventArgs e)
         {
-            // TODO: Selvitä, miten kirjoittaa Excel-tiedostoon nopeammin! Nyt on ihan PERKULEEN hidas! :D
             Stopwatch sw = new Stopwatch();
             sw.Start();
             SaveResultsToFile();
