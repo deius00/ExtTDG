@@ -50,7 +50,6 @@
             this.btnOpenFileDialog = new System.Windows.Forms.Button();
             this.cbAllowOverwrite = new System.Windows.Forms.CheckBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.tsStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.tsProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.tsStatusDuration = new System.Windows.Forms.ToolStripStatusLabel();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
@@ -271,7 +270,6 @@
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsStatusLabel,
             this.tsProgressBar,
             this.tsStatusDuration});
             this.statusStrip1.Location = new System.Drawing.Point(0, 547);
@@ -279,12 +277,6 @@
             this.statusStrip1.Size = new System.Drawing.Size(886, 22);
             this.statusStrip1.TabIndex = 2;
             this.statusStrip1.Text = "statusStrip1";
-            // 
-            // tsStatusLabel
-            // 
-            this.tsStatusLabel.Name = "tsStatusLabel";
-            this.tsStatusLabel.Size = new System.Drawing.Size(39, 17);
-            this.tsStatusLabel.Text = "Ready";
             // 
             // tsProgressBar
             // 
@@ -294,8 +286,8 @@
             // tsStatusDuration
             // 
             this.tsStatusDuration.Name = "tsStatusDuration";
-            this.tsStatusDuration.Size = new System.Drawing.Size(199, 17);
-            this.tsStatusDuration.Text = "Last session duration in milliseconds";
+            this.tsStatusDuration.Size = new System.Drawing.Size(42, 17);
+            this.tsStatusDuration.Text = "Ready.";
             // 
             // saveFileDialog1
             // 
@@ -338,7 +330,6 @@
         private System.Windows.Forms.TextBox tbAnomalyChance;
         private System.Windows.Forms.TextBox tbFilePath;
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel tsStatusLabel;
         private System.Windows.Forms.ToolStripProgressBar tsProgressBar;
         private System.Windows.Forms.ToolStripStatusLabel tsStatusDuration;
         private System.Windows.Forms.Button btnOpenFileDialog;

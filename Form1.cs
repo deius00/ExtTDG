@@ -160,8 +160,7 @@ namespace ExtTDG
                 tsProgressBar.Value = 0;
 
                 // Reset toolstrip status text
-                tsStatusLabel.Text = "Generating...";
-                tsStatusDuration.Text = "";
+                tsStatusDuration.Text = "Generating...";
 
                 // Cache generators key-value-pairs used in this session
                 foreach (GeneratorParameters gp in m_generatorParameters)
@@ -511,9 +510,8 @@ namespace ExtTDG
             tsProgressBar.PerformStep();
 
             // Update toolstrip text
-            tsStatusLabel.Text = "Done.";
-            string genText = "Generation " + m_generationDuration + " ms";
-            string writeText = "file write " + m_fileWriteDuration + " ms";
+            string genText = "Done. Generation " + m_generationDuration + " ms";
+            string writeText = "file write " + m_fileWriteDuration + " ms.";
             tsStatusDuration.Text = genText + ", " + writeText;
             btnGenerate.Enabled = true;
         }
