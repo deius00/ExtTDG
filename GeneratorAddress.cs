@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ExtTDG
 {
-    class GeneratorAddress : IGenerator
+    public class GeneratorAddress : IGenerator
     {
 		private string allowedChars;
 		private string anomalyChars;
@@ -30,15 +30,62 @@ namespace ExtTDG
 
 		public List<string> Generate(int numItems, double anomalyChance, Random rng)
         {
+			HashSet<string> alreadyGeneratedStrings = new HashSet<string>();
 			List<string> results = new List<string>();
-			
-			// NOTE: Placeholder data insertion
-			for(int i = 0; i < numItems; i++)
+
+			int currentItemIndex = 0;
+			while(results.Count < numItems)
             {
-				results.Add("Placeholder 1");
-            }
+				string newItem = GenerateRandomAddress(Addresses.kAddresses, rng);
+				if(hasAnomalies)
+                {
+					if(anomalyChance < rng.NextDouble())
+                    {
+						newItem = GenerateAnomaly(newItem, rng);
+					}
+				}
+
+				if(isUnique)
+                {
+					if(!alreadyGeneratedStrings.Contains(newItem))
+                    {
+						alreadyGeneratedStrings.Add(newItem);
+						results.Add(newItem);
+						currentItemIndex++;
+                    }
+                }
+                else
+                {
+					results.Add(newItem);
+					currentItemIndex++;
+				}
+			}
 
 			return results;
+        }
+
+		private string GenerateRandomAddress(string[] addresses, Random rng)
+        {
+			string address = addresses[rng.Next(0, addresses.Length)];
+
+			if(rng.NextDouble() < 0.5f)
+            {
+				// Add letter
+				string kLetters = "ABCDEFGHJKLMN";
+				address += " " + kLetters[rng.Next(0, kLetters.Length)].ToString();
+            }
+
+			address += " " + rng.Next(1, 60).ToString();
+
+			return address;
+        }
+
+		private string GenerateAnomaly(string item, Random rng)
+        {
+			char[] itemAsChars = item.ToCharArray();
+			int anomalyIndex = rng.Next(0, item.Length);
+			itemAsChars[anomalyIndex] = this.anomalyChars[rng.Next(0, this.anomalyChars.Length)];
+			return new string(itemAsChars);
         }
 	}
 }
