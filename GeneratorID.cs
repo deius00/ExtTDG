@@ -6,7 +6,7 @@ namespace ExtTDG
     class GeneratorID  : IGenerator
     {
         private string allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        private string anomalyChars = "!#¤%&()=?/;.:,_-<>|@£${[]}*";
+        private string anomalyChars = "!#¤%&()?/;.:,_-<>|@£${[]}*";
         private int minLength;
         private int maxLength;
         private bool hasAnomalies;
@@ -123,7 +123,7 @@ namespace ExtTDG
             if (this.uniqueStrings && this.allowedChars.Length < 10 && numItems > 1000000)
             {
                 this.allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-                this.anomalyChars = "!#¤%&()=?/;.:,_-<>|@£${[]}*";
+                this.anomalyChars = "!#¤%&()?/;.:,_-<>|@£${[]}*";
                 this.letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
                 this.numbers = "0123456789";
                 Console.WriteLine("Too few allowed characters and large amount of unique IDs. Reverting to default allowed characters.");

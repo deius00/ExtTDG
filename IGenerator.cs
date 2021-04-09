@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
+
+/// <summary>
+/// Interface for generator.
+/// Generator must provide now only Generate()-method.
+/// </summary>
 namespace ExtTDG
 {
     interface IGenerator

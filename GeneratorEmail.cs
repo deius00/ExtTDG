@@ -11,7 +11,7 @@ namespace ExtTDG
         private List<string> firstNames = (new FirstNames()).GetFirstNamesList();
         private List<string> lastNames = (new LastNames()).GetLastNamesList();
         private string allowedChars = "abcdefghijklmnopqrstuvwxyz-@.";
-        private string anomalyChars = "!#¤%&()=?/;:,_<>|£${[]}*";
+        private string anomalyChars = "!#¤%&()?/;:,_<>|£${[]}*";
         private int minLength;
         private int maxLength;
         private bool hasAnomalies;

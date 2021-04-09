@@ -6,7 +6,7 @@ namespace ExtTDG
 	public class GeneratorDate : IGenerator
     {
         private int dateFormat = 0; 
-        private string anomalyChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#¤%&()=?;:,_<>|@£${[]}"; 
+        private string anomalyChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#¤%&()?;:,_<>|@£${[]}"; 
         private DateTime minDate; 
         private DateTime maxDate; 
         private bool hasAnomalies; 

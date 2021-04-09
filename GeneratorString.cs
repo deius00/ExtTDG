@@ -6,7 +6,7 @@ namespace ExtTDG
     public class GeneratorString : IGenerator
     {
         private string allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        private string anomalyChars = "!#¤%&()=?/;.:,_-<>|@£${[]}*";
+        private string anomalyChars = "!#¤%&()?/;.:,_-<>|@£${[]}*";
         private int minLength;
         private int maxLength;
         private bool hasAnomalies;
