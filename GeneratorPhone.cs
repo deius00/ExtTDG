@@ -24,6 +24,12 @@ namespace ExtTDG
 			this.maxValue = int.Parse(maxValue);
 			this.hasAnomalies = hasAnomalies;
 			this.isUnique = isUnique;
+
+			// length limit checks to prevent crashing
+			if (this.minValue < 3)
+				this.minValue = 3;
+			if (this.minValue > this.maxValue)
+				this.maxValue = this.minValue;
 		}
 
 		public List<string> Generate(int numItems, double anomalyChance, Random rng)
@@ -31,6 +37,13 @@ namespace ExtTDG
 			HashSet<string> alreadyGeneratedStrings = new HashSet<string>();
 			List<string> results = new List<string>();
 			List<int> itemIndicesWithAnomalies = new List<int>();
+
+			// check sufficient availability of unique items
+			if (this.isUnique && Math.Log(2 * numItems, this.allowedChars.Length) > this.maxValue - 3)
+			{
+				this.isUnique = false;
+				Console.WriteLine("Too few available unique phone numbers of given length. Request for uniqueness is ignored.");
+			}
 
 			string[] prefixes = { "040", "045", "050" };
 
@@ -83,7 +96,7 @@ namespace ExtTDG
 		private string GenerateNumber(string[] prefixes, Random rng)
 		{
 			// Randomize item length
-			int len = rng.Next(minValue, minValue);
+			int len = rng.Next(minValue, maxValue);
 			char[] itemAsChars = new char[len];
 
 			string prefix = prefixes[rng.Next(0, prefixes.Length)];
