@@ -21,6 +21,7 @@ namespace ExtTDG
         private long m_generationDuration = 0;
         private long m_fileWriteDuration = 0;
         private bool m_isFileSelected = false;
+        private bool m_saveToFileOk = false;
         private BackgroundWorker m_worker = new BackgroundWorker();
 
         private enum DataClassType
@@ -101,11 +102,13 @@ namespace ExtTDG
             // Initialize background worker
             m_worker.DoWork += new DoWorkEventHandler(StartBackgroundWork);
             m_worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(FinishedBackgroundWork);
+            tbFilePath.TextChanged += tbFilePath_TextChanged;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             PopulateDataGridView();
+            DeactivateGenerateButton();
         }
 
         private void btnGenerate_Click(object sender, EventArgs e)
@@ -426,6 +429,7 @@ namespace ExtTDG
             ExcelRange selectedRange = workSheet.Range[cellStart, cellEnd];
             selectedRange.NumberFormat = "@";
             selectedRange.Value = arr;
+            selectedRange.Columns.AutoFit();
 
             // Write headers to columns
             for(int i = 0; i < m_allResults.Count; i++)
@@ -433,11 +437,33 @@ namespace ExtTDG
                 workSheet.Cells[1, 1 + i] = m_generatorParameters[i].dataClassTypeName;
             }
 
-            workSheet.SaveAs(tbFilePath.Text, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, Type.Missing);
-            workBook.Close(false, Type.Missing, Type.Missing);
+            // Try writing to file until operation is successful or aborted by user
+            bool canContinue = false;
+            while(!canContinue)
+            {
+                try
+                {
+                    workSheet.SaveAs(tbFilePath.Text, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, Type.Missing);
+                    workBook.Close(false, Type.Missing, Type.Missing);
+                    canContinue = true;
+                    m_saveToFileOk = true;
+                }
+                catch (System.Runtime.InteropServices.COMException e)
+                {
+                    // Catch 
+                    string msg = "Result file open in Excel.\nClose Excel and press Retry.";
+                    DialogResult result = MessageBox.Show(msg, "Error!", MessageBoxButtons.RetryCancel);
+                    if (result == DialogResult.Cancel)
+                    {
+                        // Aborted by user, do not save results to file
+                        canContinue = true;
+                        m_saveToFileOk = false;
+                    }
+                }
+            }
+
             app.Quit();
         }
-
 
         // Validate input to cells
         private void dgv_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
@@ -455,7 +481,7 @@ namespace ExtTDG
                 if (!int.TryParse(e.FormattedValue.ToString(), out newValue) || newValue < 0)
                 {
                     e.Cancel = true;
-                    dgvGenerators.Rows[e.RowIndex].ErrorText = "Value must be greater than 0 and integer";
+                    dgvGenerators.Rows[e.RowIndex].ErrorText = "Only integers greater than 0";
                 }
             }
 
@@ -466,8 +492,23 @@ namespace ExtTDG
                 if (!int.TryParse(e.FormattedValue.ToString(), out newValue) || newValue < 0)
                 {
                     e.Cancel = true;
-                    dgvGenerators.Rows[e.RowIndex].ErrorText = "Value must be greater than 0 and integer";
+                    dgvGenerators.Rows[e.RowIndex].ErrorText = "Only integers greater than 0";
                 }
+            }
+        }
+
+        // Validate text changed on tbFilePath
+        private void tbFilePath_TextChanged(object sender, EventArgs e)
+        {
+            if(tbFilePath.TextLength > 0)
+            {
+                m_isFileSelected = true;
+                ActivateGenerateButton();
+            }
+            else
+            {
+                m_isFileSelected = false;
+                DeactivateGenerateButton();
             }
         }
 
@@ -475,14 +516,25 @@ namespace ExtTDG
         private void btnOpenFileDialog_Click(object sender, EventArgs e)
         {
             saveFileDialog1.Filter = "Excel file|*.xlsx";
-            saveFileDialog1.Title = "Save results to Excel-file:";
+            saveFileDialog1.Title = "Save results to Excel-file";
             DialogResult result = saveFileDialog1.ShowDialog();
             if (result == DialogResult.OK)
             {
                 string filePath = saveFileDialog1.FileName;
                 tbFilePath.Text = filePath;
                 m_isFileSelected = true;
+                ActivateGenerateButton();
             }
+        }
+
+        private void ActivateGenerateButton()
+        {
+            btnGenerate.Enabled = true;
+        }
+
+        private void DeactivateGenerateButton()
+        {
+            btnGenerate.Enabled = false;
         }
 
         // Start background worker to save results to file
@@ -497,13 +549,25 @@ namespace ExtTDG
 
         private void FinishedBackgroundWork(object sender, RunWorkerCompletedEventArgs e)
         {
-            tsProgressBar.PerformStep();
-
             // Update toolstrip text
-            string genText = "Done. Generation " + m_generationDuration + " ms";
-            string writeText = "file write " + m_fileWriteDuration + " ms.";
-            tsStatusDuration.Text = genText + ", " + writeText;
-            btnGenerate.Enabled = true;
+            tsProgressBar.PerformStep();
+            string genText;
+            string writeText;
+            string message;
+            if(m_saveToFileOk)
+            {
+                genText = "Done. Generation " + m_generationDuration + " ms";
+                writeText = "file write " + m_fileWriteDuration + " ms.";
+                message = genText + ", " + writeText;
+            }
+            else
+            {
+                genText = "Saving aborted by user.";
+                message = genText;
+            }
+
+            tsStatusDuration.Text = message;
+            ActivateGenerateButton();
         }
     }
 }
