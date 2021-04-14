@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ExtTDG
+namespace ExtTDG.Data
 {
     public class Addresses
     {
-        public static string[] kAddresses = {
+        public static readonly string[] kAddresses = {
             "A.I. Virtasen aukio",
             "Aadolfinkatu",
             "Aamukasteenkuja",
