@@ -60,6 +60,20 @@ namespace ExtTDG
 				result = false;
 			}
 
+			// Validate allowed characters
+			if (this.allowedChars == null || this.allowedChars.Length == 0)
+			{
+				errorMessages += "Allowed chars empty\n";
+				result = false;
+			}
+
+			// Validate anomaly characters
+			if (this.anomalyChars == null || this.anomalyChars.Length == 0)
+			{
+				errorMessages += "Anomaly characters empty\n";
+				result = false;
+			}
+
 			// Validate uniqueness and number count (is unique / not unique)
 			int possibleNumbers = 0;
 			if(result)

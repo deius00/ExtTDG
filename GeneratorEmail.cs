@@ -10,69 +10,82 @@ namespace ExtTDG
     {
         private List<string> firstNames = (new FirstNames()).GetFirstNamesList();
         private List<string> lastNames = (new LastNames()).GetLastNamesList();
-        private string allowedChars = "abcdefghijklmnopqrstuvwxyz-@.";
-        private string anomalyChars = "!#¤%&()?/;:,_<>|£${[]}*";
+        //private string allowedChars = "abcdefghijklmnopqrstuvwxyz-@.";
+        //private string anomalyChars = "!#¤%&()?/;:,_<>|£${[]}*";
+        private string allowedChars;
+        private string anomalyChars;
         private int minLength;
         private int maxLength;
         private bool hasAnomalies;
         private bool uniqueStrings;
+        private bool minLengthOk;
+        private bool maxLengthOk;
 
         private string letters = "abcdefghijklmnopqrstuvwxyz";
 
         public GeneratorEmail(string allowedChars, string anomalyChars,
             string minValue, string maxValue, bool hasAnomalies, bool isUnique)
         {
-            if (!String.IsNullOrWhiteSpace(allowedChars))
-                this.allowedChars = allowedChars;
-            this.allowedChars = this.allowedChars.ToLower();
-            this.allowedChars = this.allowedChars.Replace("@", "");
-            this.allowedChars = this.allowedChars.Replace(".", "");
-            if (!String.IsNullOrWhiteSpace(anomalyChars))
-                this.anomalyChars = anomalyChars;
-            for (int i = 0; i < this.allowedChars.Length; i++)
-                this.anomalyChars = this.anomalyChars.Replace(this.allowedChars[i].ToString(), "");
-            this.anomalyChars = this.anomalyChars.Replace("@", "");
-            this.anomalyChars = this.anomalyChars.Replace(".", "");
-            if (this.anomalyChars.Length == 0)
-                this.anomalyChars = "!";
-            foreach (char c in this.anomalyChars)
-                this.letters = this.letters.Replace(c.ToString(), "");
-            if (this.letters.Length == 0)
-                this.letters = "abcdefghijklmnopqrstuvwxyz";
+            //if (!String.IsNullOrWhiteSpace(allowedChars))
+            //    this.allowedChars = allowedChars;
+            //this.allowedChars = this.allowedChars.ToLower();
+            //this.allowedChars = this.allowedChars.Replace("@", "");
+            //this.allowedChars = this.allowedChars.Replace(".", "");
+            //if (!String.IsNullOrWhiteSpace(anomalyChars))
+            //    this.anomalyChars = anomalyChars;
+            //for (int i = 0; i < this.allowedChars.Length; i++)
+            //    this.anomalyChars = this.anomalyChars.Replace(this.allowedChars[i].ToString(), "");
+            //this.anomalyChars = this.anomalyChars.Replace("@", "");
+            //this.anomalyChars = this.anomalyChars.Replace(".", "");
+            //if (this.anomalyChars.Length == 0)
+            //    this.anomalyChars = "!";
+            //foreach (char c in this.anomalyChars)
+            //    this.letters = this.letters.Replace(c.ToString(), "");
+            //if (this.letters.Length == 0)
+            //    this.letters = "abcdefghijklmnopqrstuvwxyz";
 
-            try
-            {
-                this.minLength = Int32.Parse(minValue);
-                if (this.minLength <= 0)
-                {
-                    this.minLength = 1;
-                    Console.WriteLine("Unusable minimum length. Using default minimum length of 1.");
-                }
-            }
-            catch (Exception e)
-            {
-                this.minLength = 1;
-                Console.WriteLine("Unusable minimum length. Using default minimum length of 1.");
-            }
-            try
-            {
-                this.maxLength = Int32.Parse(maxValue);
-                if (this.maxLength < this.minLength)
-                {
-                    this.maxLength = 50;
-                    Console.WriteLine("Maximum length less than minimum length. Using default maximum length of 50.");
-                }
-                if (this.maxLength < 7)
-                {
-                    this.maxLength = 50;
-                    Console.WriteLine("Too short maximum length. Using default maximum length of 50.");
-                }
-            }
-            catch (Exception e)
-            {
-                this.maxLength = 50;
-                Console.WriteLine("Unusable maximum length. Using default maximum length of 50.");
-            }
+            //try
+            //{
+            //    this.minLength = Int32.Parse(minValue);
+            //    if (this.minLength <= 0)
+            //    {
+            //        this.minLength = 1;
+            //        Console.WriteLine("Unusable minimum length. Using default minimum length of 1.");
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    this.minLength = 1;
+            //    Console.WriteLine("Unusable minimum length. Using default minimum length of 1.");
+            //}
+            //try
+            //{
+            //    this.maxLength = Int32.Parse(maxValue);
+            //    if (this.maxLength < this.minLength)
+            //    {
+            //        this.maxLength = 50;
+            //        Console.WriteLine("Maximum length less than minimum length. Using default maximum length of 50.");
+            //    }
+            //    if (this.maxLength < 7)
+            //    {
+            //        this.maxLength = 50;
+            //        Console.WriteLine("Too short maximum length. Using default maximum length of 50.");
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    this.maxLength = 50;
+            //    Console.WriteLine("Unusable maximum length. Using default maximum length of 50.");
+            //}
+
+            //this.hasAnomalies = hasAnomalies;
+            //this.uniqueStrings = isUnique;
+
+            this.allowedChars = allowedChars;
+            this.anomalyChars = anomalyChars;
+
+            this.minLengthOk = int.TryParse(minValue, out this.minLength);
+            this.maxLengthOk = int.TryParse(maxValue, out this.maxLength);
 
             this.hasAnomalies = hasAnomalies;
             this.uniqueStrings = isUnique;
@@ -80,10 +93,44 @@ namespace ExtTDG
 
         public bool Validate(int numItems, out string msg)
         {
-            msg = "GeneratorEmail: ";
-            return true;
-        }
+            bool result = true;
+            string errorMessages = "";
 
+            // Validate minimum length
+            if(!this.minLengthOk)
+            {
+                errorMessages += "Cannot parse minimum length\n";
+                result = false;
+            }
+
+            if (this.minLength < 0)
+            {
+                errorMessages += "Minimum length less than zero\n";
+                result = false;
+            }
+
+            if(this.minLength >= this.maxLength)
+            {
+                errorMessages += "Minimum length is greater or equal than maximum length\n";
+                result = false;
+            }
+
+            // Validate maximum length
+            if (!this.maxLengthOk)
+            {
+                errorMessages += "Cannot parse maximum length\n";
+                result = false;
+            }
+
+            if(this.maxLength < this.minLength)
+            {
+                errorMessages += "Maximum length less or equal than minimum length\n";
+                result = false;
+            }
+
+            msg = "GeneratorEmail: " + errorMessages;
+            return result;
+        }
 
         public List<string> Generate(int numItems, double anomalyChance, Random rng)
         {

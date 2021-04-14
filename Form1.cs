@@ -14,6 +14,8 @@ namespace ExtTDG
 {
     public partial class Form1 : Form
     {
+        // Contains minimum and maximum values for all DataClass types
+        private DataClassRegistry m_dataClassRegistry = new DataClassRegistry();
         private Dictionary<DataClassType, IGenerator> generatorTypes = new Dictionary<DataClassType, IGenerator>();
         private List<GeneratorParameters> m_generatorParameters = new List<GeneratorParameters>();
         private List<GeneratorStats> m_generatorStats = new List<GeneratorStats>();
@@ -23,11 +25,6 @@ namespace ExtTDG
         private bool m_isFileSelected = false;
         private bool m_saveToFileOk = false;
         private BackgroundWorker m_worker = new BackgroundWorker();
-
-        private enum DataClassType
-        {
-            Name, Int32, Email, Date, Address, Phone, URL, ID, String
-        };
 
         // POD for generator parameters
         private class GeneratorParameters
@@ -107,9 +104,19 @@ namespace ExtTDG
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            // Set default values for each DataClassType
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Name, "1", "50");
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Int32, "0", "100");
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Email, "5", "50");
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Date, "10000101", "99991231");
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Address, "0", "50");
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Phone, "7", "12");
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.URL, "0", "50");
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.ID, "1", "6");
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.String, "1", "15");
+
             PopulateDataGridView();
             DeactivateGenerateButton();
-
             ValidateTest();
         }
 
@@ -307,8 +314,8 @@ namespace ExtTDG
             // Default values for Email
             dgvGenerators.Rows[2].Cells[0].Value = true;
             dgvGenerators.Rows[2].Cells[1].Value = DataClassType.Email;
-            dgvGenerators.Rows[2].Cells[2].Value = "abcdefghijklmnopqrstuvwxyz1234567890";
-            dgvGenerators.Rows[2].Cells[3].Value = "!/#[]";
+            dgvGenerators.Rows[2].Cells[2].Value = "abcdefghijklmnopqrstuvwxyz-@.";
+            dgvGenerators.Rows[2].Cells[3].Value = "!#¤%&()?/;:,_<>|£${[]}*";
             dgvGenerators.Rows[2].Cells[4].Value = "3";
             dgvGenerators.Rows[2].Cells[5].Value = "30";
             dgvGenerators.Rows[2].Cells[6].Value = true;
@@ -330,7 +337,7 @@ namespace ExtTDG
             dgvGenerators.Rows[4].Cells[2].Value = "abcdefghijklmnopqrstuvwxyz";
             dgvGenerators.Rows[4].Cells[3].Value = "!#&/";
             dgvGenerators.Rows[4].Cells[4].Value = "0";
-            dgvGenerators.Rows[4].Cells[5].Value = "0";
+            dgvGenerators.Rows[4].Cells[5].Value = "50";
             dgvGenerators.Rows[4].Cells[6].Value = true;
             dgvGenerators.Rows[4].Cells[7].Value = true;
 
@@ -393,9 +400,46 @@ namespace ExtTDG
                     gp.allowedCharacters = (string)row.Cells[2].Value;
                     gp.anomalyCharacters = (string)row.Cells[3].Value;
 
-                    // Try to parse minimum and maximum length
-                    gp.minLength = row.Cells[4].Value.ToString();
-                    gp.maxLength = row.Cells[5].Value.ToString();
+                    // Parse minimum length
+                    if(row.Cells[4].Value == null)
+                    {
+                        // Use default min value for generator and update cell
+                        gp.minLength = m_dataClassRegistry.GetDefaultMinValue(gp.dataClassType);
+                        row.Cells[4].Value = gp.minLength;
+                    }
+                    else
+                    {
+                        if(String.IsNullOrWhiteSpace(row.Cells[4].Value.ToString()))
+                        {
+                            gp.minLength = m_dataClassRegistry.GetDefaultMinValue(gp.dataClassType);
+                            row.Cells[4].Value = gp.minLength;
+                        }
+                        else
+                        {
+                            gp.minLength = row.Cells[4].Value.ToString();
+                        }
+                    }
+
+                    // Parse maximum length
+                    if (row.Cells[5].Value == null)
+                    {
+                        // Use default max value for generator and update cell
+                        gp.maxLength = m_dataClassRegistry.GetDefaultMaxValue(gp.dataClassType);
+                        row.Cells[5].Value = gp.maxLength;
+                        Console.WriteLine(row.Cells[5].Value.ToString());
+                    }
+                    else
+                    {
+                        if (String.IsNullOrWhiteSpace(row.Cells[5].Value.ToString()))
+                        {
+                            gp.maxLength = m_dataClassRegistry.GetDefaultMaxValue(gp.dataClassType);
+                            row.Cells[5].Value = gp.maxLength;
+                        }
+                        else
+                        {
+                            gp.maxLength = row.Cells[5].Value.ToString();
+                        }
+                    }
 
                     gp.hasAnomalies = (bool)row.Cells[6].Value;
                     gp.isUnique = (bool)row.Cells[7].Value;
@@ -503,28 +547,6 @@ namespace ExtTDG
             {
                 return;
             }
-
-            // Check column minimum length
-            if (e.ColumnIndex == 4)
-            {
-                int newValue;
-                if (!int.TryParse(e.FormattedValue.ToString(), out newValue) || newValue < 0)
-                {
-                    e.Cancel = true;
-                    dgvGenerators.Rows[e.RowIndex].ErrorText = "Only integers greater than 0";
-                }
-            }
-
-            // Check column maximum length
-            if (e.ColumnIndex == 5)
-            {
-                int newValue;
-                if (!int.TryParse(e.FormattedValue.ToString(), out newValue) || newValue < 0)
-                {
-                    e.Cancel = true;
-                    dgvGenerators.Rows[e.RowIndex].ErrorText = "Only integers greater than 0";
-                }
-            }
         }
 
         // Validate text changed on tbFilePath
@@ -602,17 +624,17 @@ namespace ExtTDG
 
         private void ValidateTest()
         {
-            dgvGenerators.Rows[0].Cells[0].Value = false;
+            //dgvGenerators.Rows[0].Cells[0].Value = false;
             //dgvGenerators.Rows[1].Cells[0].Value = false;
-            dgvGenerators.Rows[2].Cells[0].Value = false;
-            dgvGenerators.Rows[3].Cells[0].Value = false;
-            dgvGenerators.Rows[4].Cells[0].Value = false;
-            dgvGenerators.Rows[5].Cells[0].Value = false;
-            dgvGenerators.Rows[6].Cells[0].Value = false;
-            dgvGenerators.Rows[7].Cells[0].Value = false;
-            dgvGenerators.Rows[8].Cells[0].Value = false;
-            tbFilePath.Text = "C:\\Users\\Janne\\Desktop\\Tulokset\\results.xlsx";
-            cbAllowOverwrite.Checked = true;
+            //dgvGenerators.Rows[2].Cells[0].Value = false;
+            //dgvGenerators.Rows[3].Cells[0].Value = false;
+            //dgvGenerators.Rows[4].Cells[0].Value = false;
+            //dgvGenerators.Rows[5].Cells[0].Value = false;
+            //dgvGenerators.Rows[6].Cells[0].Value = false;
+            //dgvGenerators.Rows[7].Cells[0].Value = false;
+            //dgvGenerators.Rows[8].Cells[0].Value = false;
+            //tbFilePath.Text = "C:\\Users\\Janne\\Desktop\\Tulokset\\results.xlsx";
+            //cbAllowOverwrite.Checked = true;
         }
     }
 }

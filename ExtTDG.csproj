@@ -70,12 +70,14 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="GeneratorAddress.cs" />
+    <Compile Include="DataClassType.cs" />
     <Compile Include="GeneratorDate.cs" />
     <Compile Include="GeneratorEmail.cs" />
     <Compile Include="GeneratorID.cs" />
     <Compile Include="GeneratorInt32.cs" />
     <Compile Include="GeneratorName.cs" />
     <Compile Include="GeneratorPhone.cs" />
+    <Compile Include="DataClassRegistry.cs" />
     <Compile Include="GeneratorString.cs" />
     <Compile Include="GeneratorURL.cs" />
     <Compile Include="IGenerator.cs" />
