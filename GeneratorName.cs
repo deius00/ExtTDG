@@ -30,49 +30,78 @@ namespace ExtTDG
                 this.anomalyChars = this.anomalyChars.Replace(this.allowedChars[i].ToString(), "");
             if (this.anomalyChars.Length == 0)
                 this.anomalyChars = "!";
-            
-            try
+
+            // Set -1 to minValue and maxValue if parsing is unsuccessful
+            // and do bound checking in Validate()
+            if (!int.TryParse(minValue, out this.minLength))
             {
-                this.minLength = Int32.Parse(minValue);
-                if (this.minLength <= 0 || this.minLength > 15)
-                {
-                    this.minLength = 1;
-                    Console.WriteLine("Unusable minimum length. Using default minimum length of 1.");
-                }
+                this.minLength = -1;
             }
-            catch (Exception e)
+
+            if (!int.TryParse(maxValue, out this.maxLength))
             {
-                this.minLength = 1;
-                Console.WriteLine("Unusable minimum length. Using default minimum length of 1.");
+                this.maxLength = -1;
             }
-            try
-            {
-                this.maxLength = Int32.Parse(maxValue);
-                if (this.maxLength < this.minLength)
-                {
-                    this.maxLength = 50;
-                    Console.WriteLine("Maximum length less than minimum length. Using default maximum length of 50.");
-                }
-                if (this.maxLength < 15)
-                {
-                    this.maxLength = 50;
-                    Console.WriteLine("Too short maximum length. Using default maximum length of 50.");
-                }
-            }
-            catch (Exception e)
-            {
-                this.maxLength = 50;
-                Console.WriteLine("Unusable maximum length. Using default maximum length of 50.");
-            }
-            
+
             this.hasAnomalies = hasAnomalies;
             this.uniqueStrings = isUnique;
         }
 
         public bool Validate(int numItems, out string msg)
         {
-            msg = "GeneratorName: ";
-            return true;
+            bool result = true;
+            string errorMessages = "";
+
+            // Validate minLength
+            if(this.minLength < 0)
+            {
+                errorMessages += "Cannot parse minLength\n";
+                result = false;
+            }
+
+            if(this.minLength == 0)
+            {
+                errorMessages += "Minimum length cannot be zero\n";
+                result = false;
+            }
+
+            if(this.minLength >= maxLength)
+            {
+                errorMessages += "Minimum length cannot be equal or greater than maximum length\n";
+                result = false;
+            }
+
+            // Validate maxLength
+            if (this.maxLength < 0)
+            {
+                errorMessages += "Cannot parse maxLength\n";
+                result = false;
+            }
+
+            if(this.maxLength == 0)
+            {
+                errorMessages += "Maximum length cannot be zero\n";
+                result = false;
+            }
+
+            if (this.maxLength <= this.minLength)
+            {
+                errorMessages += "Maximum length cannot be equal or less than minimum length\n";
+                result = false;
+            }
+
+            // Validate uniqueness and possible unique item count problem
+            if(this.uniqueStrings)
+            {
+                if (maxLength < 8)
+                {
+                    errorMessages += "Cannot guarantee uniqueness, raise maximum length to 8\n";
+                    result = false;
+                }
+            }
+
+            msg = "GeneratorName: " + errorMessages;
+            return result;
         }
 
         public List<string> Generate(int numItems, double anomalyChance, Random rng)

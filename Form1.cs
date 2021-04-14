@@ -109,12 +109,20 @@ namespace ExtTDG
         {
             PopulateDataGridView();
             DeactivateGenerateButton();
+
+            ValidateTest();
         }
 
         private void btnGenerate_Click(object sender, EventArgs e)
         {
             m_generatorParameters = GetGeneratorParameters();
             SessionParameters sessionParameters = GetSessionParameters();
+
+            if(m_generatorParameters.Count == 0)
+            {
+                // No generators active, do nothing
+                return;
+            }
 
             // Cache error messages and show them to user
             List<string> errorMessages = new List<string>();
@@ -215,7 +223,7 @@ namespace ExtTDG
                 List<string> validationMessages = new List<string>();
                 foreach (GeneratorParameters gp in m_generatorParameters)
                 {
-                    string msg;
+                    string msg = "";
                     isValidationOk &= generatorTypes[gp.dataClassType].Validate(sessionParameters.numItems, out msg);
                     validationMessages.Add(msg);
                 }
@@ -279,10 +287,10 @@ namespace ExtTDG
             // Default values for Name
             dgvGenerators.Rows[0].Cells[0].Value = true;
             dgvGenerators.Rows[0].Cells[1].Value = DataClassType.Name;
-            dgvGenerators.Rows[0].Cells[2].Value = "abcdefghijklmnopqrustuvwxyz";
-            dgvGenerators.Rows[0].Cells[3].Value = "!#()";
+            dgvGenerators.Rows[0].Cells[2].Value = "abcdefghijklmnopqrstuvwxyzåäöABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ-'";
+            dgvGenerators.Rows[0].Cells[3].Value = "!#¤%&()?/;.:,_<>|@£${[]}*";
             dgvGenerators.Rows[0].Cells[4].Value = "1";
-            dgvGenerators.Rows[0].Cells[5].Value = "5";
+            dgvGenerators.Rows[0].Cells[5].Value = "8";
             dgvGenerators.Rows[0].Cells[6].Value = true;
             dgvGenerators.Rows[0].Cells[7].Value = true;
 
@@ -590,6 +598,21 @@ namespace ExtTDG
 
             tsStatusDuration.Text = message;
             ActivateGenerateButton();
+        }
+
+        private void ValidateTest()
+        {
+            dgvGenerators.Rows[0].Cells[0].Value = false;
+            //dgvGenerators.Rows[1].Cells[0].Value = false;
+            dgvGenerators.Rows[2].Cells[0].Value = false;
+            dgvGenerators.Rows[3].Cells[0].Value = false;
+            dgvGenerators.Rows[4].Cells[0].Value = false;
+            dgvGenerators.Rows[5].Cells[0].Value = false;
+            dgvGenerators.Rows[6].Cells[0].Value = false;
+            dgvGenerators.Rows[7].Cells[0].Value = false;
+            dgvGenerators.Rows[8].Cells[0].Value = false;
+            tbFilePath.Text = "C:\\Users\\Janne\\Desktop\\Tulokset\\results.xlsx";
+            cbAllowOverwrite.Checked = true;
         }
     }
 }
