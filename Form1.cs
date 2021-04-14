@@ -209,7 +209,29 @@ namespace ExtTDG
                     }
                 }
 
-                // Call each subgenerator
+
+                // Validate subgenerators
+                bool isValidationOk = true;
+                List<string> validationMessages = new List<string>();
+                foreach (GeneratorParameters gp in m_generatorParameters)
+                {
+                    string msg;
+                    isValidationOk &= generatorTypes[gp.dataClassType].Validate(sessionParameters.numItems, out msg);
+                    validationMessages.Add(msg);
+                }
+
+                if (!isValidationOk)
+                {
+                    // Show errors and return
+                    foreach(string s in validationMessages)
+                    {
+                        Console.WriteLine(s);
+                    }
+
+                    return;
+                }
+
+                // Call subgenerators
                 foreach (GeneratorParameters gp in m_generatorParameters)
                 {
                     Stopwatch sw = new Stopwatch();
@@ -233,7 +255,7 @@ namespace ExtTDG
                 m_worker.RunWorkerAsync();
 
                 // Disable Generate-button until saved results to file
-                btnGenerate.Enabled = false;
+                DeactivateGenerateButton();
             }
 
             // Show error message to user at the end

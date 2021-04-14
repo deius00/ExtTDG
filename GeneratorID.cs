@@ -54,7 +54,14 @@ namespace ExtTDG
             this.hasAnomalies = hasAnomalies;
             this.uniqueStrings = isUnique;
         } // Constructor
-        
+
+        public bool Validate(int numItems, out string msg)
+        {
+            msg = "GeneratorID: ";
+            return true;
+        }
+
+
         // Makes sure that allowed and anomaly chars are not conflicting and updates letters and numbers lists.
         public void SetAllowedAndAnomalyChars(string allowedChars, string anomalyChars)
         {

@@ -32,6 +32,13 @@ namespace ExtTDG
 				this.maxValue = this.minValue;
 		}
 
+		public bool Validate(int numItems, out string msg)
+		{
+			msg = "GeneratorPhone: ";
+			return true;
+		}
+
+
 		public List<string> Generate(int numItems, double anomalyChance, Random rng)
 		{
 			HashSet<string> alreadyGeneratedStrings = new HashSet<string>();

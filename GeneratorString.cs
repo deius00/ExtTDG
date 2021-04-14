@@ -63,6 +63,13 @@ namespace ExtTDG
             this.uniqueStrings = isUnique;
         }
 
+        public bool Validate(int numItems, out string msg)
+        {
+            msg = "GeneratorString: ";
+            return true;
+        }
+
+
         public List<string> Generate(int numItems, double anomalyChance, Random rng)
         {
             HashSet<string> alreadyGenerated = new HashSet<string>();

@@ -10,6 +10,7 @@ namespace ExtTDG
 {
     interface IGenerator
     {
+        bool Validate(int numItems, out string msg);
         List<string> Generate(int numItems, double anomalyChance, Random rng);
     }
 }

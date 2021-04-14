@@ -28,6 +28,20 @@ namespace ExtTDG
 			this.isUnique = isUnique;
 		}
 
+		public bool Validate(int numItems, out string msg)
+		{
+			// Check minimum length
+			//int numPossibleUniques = Math.Log(2 * numItems, )
+			//if (this.isUnique && Math.Log(2 * numItems, this.allowedChars.Length) > this.maxValue - 3)
+			//{
+			//	this.isUnique = false;
+			//	Console.WriteLine("Too few available unique phone numbers of given length. Request for uniqueness is ignored.");
+			//}
+
+			msg = "GeneratorAddress: ";
+			return true;
+		}
+
 		public List<string> Generate(int numItems, double anomalyChance, Random rng)
         {
 			HashSet<string> alreadyGeneratedStrings = new HashSet<string>();

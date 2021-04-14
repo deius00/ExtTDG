@@ -24,6 +24,12 @@ namespace ExtTDG
 			this.isUnique = isUnique;
 		}
 
+		public bool Validate(int numItems, out string msg)
+        {
+			msg = "GeneratorURL: ";
+			return true;
+        }
+
 		public List<string> Generate(int numItems, double anomalyChance, Random rng)
 		{
 			string[] prefixes = new string[1] { "http://www." };
