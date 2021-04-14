@@ -16,7 +16,7 @@ namespace ExtTDG
     {
         // Contains minimum and maximum values for all DataClass types
         private DataClassRegistry m_dataClassRegistry = new DataClassRegistry();
-        private Dictionary<DataClassType, IGenerator> generatorTypes = new Dictionary<DataClassType, IGenerator>();
+        private Dictionary<DataClassType, IGenerator> m_generators = new Dictionary<DataClassType, IGenerator>();
         private List<GeneratorParameters> m_generatorParameters = new List<GeneratorParameters>();
         private List<GeneratorStats> m_generatorStats = new List<GeneratorStats>();
         private List<List<string>> m_allResults = new List<List<string>>();
@@ -122,17 +122,15 @@ namespace ExtTDG
 
         private void btnGenerate_Click(object sender, EventArgs e)
         {
-            m_generatorParameters = GetGeneratorParameters();
-            SessionParameters sessionParameters = GetSessionParameters();
+            List<string> errorMessages = new List<string>();
+            m_generatorParameters = BuildGeneratorParameters();
+            SessionParameters sessionParameters = BuildSessionParameters();
 
             if(m_generatorParameters.Count == 0)
             {
                 // No generators active, do nothing
                 return;
             }
-
-            // Cache error messages and show them to user
-            List<string> errorMessages = new List<string>();
 
             // Check that run parameters are ok
             bool sessionParametersOk = true;
@@ -178,67 +176,23 @@ namespace ExtTDG
                 tsStatusDuration.Text = "Generating...";
                 tbLogs.Text = "";
 
-                // Cache generators key-value-pairs used in this session
-                foreach (GeneratorParameters gp in m_generatorParameters)
-                {
-                    switch (gp.dataClassType)
-                    {
-                        case DataClassType.Name:
-                            generatorTypes[gp.dataClassType] = new GeneratorName(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
-                            break;
+                // Get new list of generators
+                m_generators = BuildGenerators();
 
-                        case DataClassType.Int32:
-                            generatorTypes[gp.dataClassType] = new GeneratorInt32(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
-                            break;
-
-                        case DataClassType.Email:
-                            generatorTypes[gp.dataClassType] = new GeneratorEmail(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
-                            break;
-
-                        case DataClassType.Date:
-                            generatorTypes[gp.dataClassType] = new GeneratorDate(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
-                            break;
-
-                        case DataClassType.Address:
-                            generatorTypes[gp.dataClassType] = new GeneratorAddress(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
-                            break;
-
-                        case DataClassType.Phone:
-                            generatorTypes[gp.dataClassType] = new GeneratorPhone(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
-                            break;
-
-                        case DataClassType.URL:
-                            generatorTypes[gp.dataClassType] = new GeneratorURL(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
-                            break;
-
-                        case DataClassType.ID:
-                            generatorTypes[gp.dataClassType] = new GeneratorID(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
-                            break;
-
-                        case DataClassType.String:
-                            generatorTypes[gp.dataClassType] = new GeneratorString(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
-                            break;
-
-                        default:
-                            throw new Exception("Generator not implemented!");
-                    }
-                }
-
-
-                // Validate subgenerators
+                // Validate generators
                 bool isValidationOk = true;
-                List<string> validationMessages = new List<string>();
+                List<string> validationErrorMessages = new List<string>();
                 foreach (GeneratorParameters gp in m_generatorParameters)
                 {
                     string msg = "";
-                    isValidationOk &= generatorTypes[gp.dataClassType].Validate(sessionParameters.numItems, out msg);
-                    validationMessages.Add(msg);
+                    isValidationOk &= m_generators[gp.dataClassType].Validate(sessionParameters.numItems, out msg);
+                    validationErrorMessages.Add(msg);
                 }
 
                 if (!isValidationOk)
                 {
                     // Show errors and return
-                    foreach(string s in validationMessages)
+                    foreach(string s in validationErrorMessages)
                     {
                         Console.WriteLine(s);
                     }
@@ -251,7 +205,7 @@ namespace ExtTDG
                 {
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
-                    List<string> generatorResults = generatorTypes[gp.dataClassType].Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
+                    List<string> generatorResults = m_generators[gp.dataClassType].Generate(sessionParameters.numItems, sessionParameters.anomalyChance, sessionParameters.rng);
                     m_generatorStats.Add(new GeneratorStats(gp.dataClassType, sw.ElapsedMilliseconds));
                     m_allResults.Add(generatorResults);
                     sw.Stop();
@@ -264,12 +218,16 @@ namespace ExtTDG
                     tbLogs.Text += "Generator" + gs.type.ToString() + " duration: " + gs.durationInMilliseconds + " ms" + "\r\n";
                 }
 
-                m_generationDuration = GetTotalDurationInMilliseconds(m_generatorStats);
+                // Calculate total generation duration
+                m_generationDuration = 0;
+                foreach (GeneratorStats gs in m_generatorStats)
+                {
+                    m_generationDuration += gs.durationInMilliseconds;
+                }
 
                 // Start background worker for saving results to file
+                // disable Generate-button until saving is done
                 m_worker.RunWorkerAsync();
-
-                // Disable Generate-button until saved results to file
                 DeactivateGenerateButton();
             }
 
@@ -384,7 +342,7 @@ namespace ExtTDG
 
         // Parse data for each row in DataGridView and return list of selected
         // parameters.
-        private List<GeneratorParameters> GetGeneratorParameters()
+        private List<GeneratorParameters> BuildGeneratorParameters()
         {
             List<GeneratorParameters> generatorParameters = new List<GeneratorParameters>();
             for (int i = 0; i < dgvGenerators.Rows.Count; i++)
@@ -451,7 +409,7 @@ namespace ExtTDG
         }
 
         // Parse parameters for this run
-        private SessionParameters GetSessionParameters()
+        private SessionParameters BuildSessionParameters()
         {
             SessionParameters rp = new SessionParameters();
             rp.isNumItemsOk = int.TryParse(tbNumItems.Text, out rp.numItems);
@@ -463,14 +421,55 @@ namespace ExtTDG
             return rp;
         }
 
-        private long GetTotalDurationInMilliseconds(List<GeneratorStats> stats)
+        private Dictionary<DataClassType, IGenerator> BuildGenerators()
         {
-            long totalDurationInMilliseconds = 0;
-            foreach (GeneratorStats gs in stats)
+            Dictionary<DataClassType, IGenerator> generators = new Dictionary<DataClassType, IGenerator>();
+            foreach (GeneratorParameters gp in m_generatorParameters)
             {
-                totalDurationInMilliseconds += gs.durationInMilliseconds;
+                switch (gp.dataClassType)
+                {
+                    case DataClassType.Name:
+                        generators[gp.dataClassType] = new GeneratorName(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
+                        break;
+
+                    case DataClassType.Int32:
+                        generators[gp.dataClassType] = new GeneratorInt32(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
+                        break;
+
+                    case DataClassType.Email:
+                        generators[gp.dataClassType] = new GeneratorEmail(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
+                        break;
+
+                    case DataClassType.Date:
+                        generators[gp.dataClassType] = new GeneratorDate(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
+                        break;
+
+                    case DataClassType.Address:
+                        generators[gp.dataClassType] = new GeneratorAddress(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
+                        break;
+
+                    case DataClassType.Phone:
+                        generators[gp.dataClassType] = new GeneratorPhone(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
+                        break;
+
+                    case DataClassType.URL:
+                        generators[gp.dataClassType] = new GeneratorURL(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
+                        break;
+
+                    case DataClassType.ID:
+                        generators[gp.dataClassType] = new GeneratorID(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
+                        break;
+
+                    case DataClassType.String:
+                        generators[gp.dataClassType] = new GeneratorString(gp.allowedCharacters, gp.anomalyCharacters, gp.minLength, gp.maxLength, gp.hasAnomalies, gp.isUnique);
+                        break;
+
+                    default:
+                        throw new Exception("Generator not implemented!");
+                }
             }
-            return totalDurationInMilliseconds;
+
+            return generators;
         }
 
         private void SaveResultsToFile()
