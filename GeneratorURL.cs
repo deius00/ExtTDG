@@ -33,8 +33,7 @@ namespace ExtTDG
 		public List<string> Generate(int numItems, double anomalyChance, Random rng)
 		{
 			string[] prefixes = new string[1] { "http://www." };
-			string[] suffixes = new string[3] { ".net", ".com", ".fi" };
-
+			string[] suffixes = new string[6] { ".com", ".fi", ".net", ".org", ".eu", ".me" };
 			HashSet<string> alreadyGeneratedStrings = new HashSet<string>();
 			List<string> results = new List<string>();
 			List<int> itemIndicesWithAnomalies = new List<int>();

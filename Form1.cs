@@ -67,7 +67,44 @@ namespace ExtTDG
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Set default values for each DataClassType
+            // Define default allowed and anomaly characters for DataClass type
+            m_dataClassRegistry.SetDefaultCharacters(DataClassType.Name,
+                "abcdefghijklmnopqrstuvwxyzåäöABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ-'",
+                "!#¤%&()?/;.:,_<>|@£${[]}*");
+            
+            m_dataClassRegistry.SetDefaultCharacters(DataClassType.Int32,
+                "0123456789",
+                "!#¤%&/()=");
+            
+            m_dataClassRegistry.SetDefaultCharacters(DataClassType.Email,
+                "abcdefghijklmnopqrstuvwxyz-@.",
+                "!#¤%&()?/;:,_<>|£${[]}*");
+            
+            m_dataClassRegistry.SetDefaultCharacters(DataClassType.Date,
+                "012",
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#¤%&()?;:,_<>|@£${[]}");
+            
+            m_dataClassRegistry.SetDefaultCharacters(DataClassType.Address,
+                "abcdefghijklmnopqrstuvwxyzåäöABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ-",
+                "!#¤%&/()=?;:,_<>|@£${[]}");
+            
+            m_dataClassRegistry.SetDefaultCharacters(DataClassType.Phone,
+                "0123456789",
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#¤%&/()=?;:,_<>|@£${[]}");
+            
+            m_dataClassRegistry.SetDefaultCharacters(DataClassType.URL,
+                "abcdefghijklmnopqrstuvwxyz1234567890",
+                "!#¤%&/()=?;:,_<>|@£${[]}");
+            
+            m_dataClassRegistry.SetDefaultCharacters(DataClassType.ID,
+                "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                "!#¤%&/()=?`@£$€{[]}^¨'*~,.;:<>|§½");
+            
+            m_dataClassRegistry.SetDefaultCharacters(DataClassType.String,
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+                "!#¤%&()?/;.:,_-<>|@£${[]}*");
+
+            // Set default min/maxvalues for each DataClassType
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Name, "1", "50");
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Int32, "0", "100");
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Email, "5", "50");
@@ -77,14 +114,14 @@ namespace ExtTDG
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.URL, "0", "50");
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.ID, "1", "6");
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.String, "1", "15");
-            
+
             // Parses rows and converts them into list of generator parameters
             // Only active and supported rows (determined by DataClassType)
             // are added to list.
             m_rowParser = new RowParser(dgvGenerators, m_dataClassRegistry);
 
             // Insert default rows to DataGridView
-            Utility.SetDefaultRowData(dgvGenerators);
+            Utility.SetDefaultRowData(dgvGenerators, m_dataClassRegistry);
             DeactivateGenerateButton();
             ValidateTest();
         }
@@ -432,7 +469,7 @@ namespace ExtTDG
             //dgvGenerators.Rows[2].Cells[0].Value = false;
             //dgvGenerators.Rows[3].Cells[0].Value = false;
             //dgvGenerators.Rows[4].Cells[0].Value = false;
-            //dgvGenerators.Rows[5].Cells[0].Value = false;
+            ////dgvGenerators.Rows[5].Cells[0].Value = false;
             //dgvGenerators.Rows[6].Cells[0].Value = false;
             //dgvGenerators.Rows[7].Cells[0].Value = false;
             //dgvGenerators.Rows[8].Cells[0].Value = false;

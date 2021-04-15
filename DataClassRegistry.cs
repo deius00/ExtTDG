@@ -7,13 +7,17 @@ namespace ExtTDG
     {
         private class DefaultValue
         {
+            public string allowedCharacters { get; set; }
+            public string anomalyCharacters { get; set; }
             public string minimumValue { get; set; }
             public string maximumValue { get; set; }
             
-            public DefaultValue(string minValue, string maxValue)
+            public DefaultValue()
             {
-                this.minimumValue = minValue;
-                this.maximumValue = maxValue;
+                allowedCharacters = "";
+                anomalyCharacters = "";
+                minimumValue = "";
+                maximumValue = "";
             }
         }
 
@@ -24,29 +28,66 @@ namespace ExtTDG
             defaults = new Dictionary<DataClassType, DefaultValue>();
         }
 
-        public void SetDefaultMinMaxValues(DataClassType dataClassType, string minValue, string maxValue)
+        public string GetDefaultAllowedChars(DataClassType type)
         {
-            defaults[dataClassType] = new DefaultValue(minValue, maxValue);
+            DefaultValue values = GetEntry(type);
+            return values.allowedCharacters;
         }
 
-        public string GetDefaultMinValue(DataClassType dataClassType)
+        public string GetDefaultAnomalyChars(DataClassType type)
         {
-            if(defaults.ContainsKey(dataClassType))
-            {
-                return defaults[dataClassType].minimumValue;
-            }
-
-            throw new Exception("No key " + dataClassType.ToString() + " in DataClassRegistry");
+            DefaultValue values = GetEntry(type);
+            return values.anomalyCharacters;
         }
 
-        public string GetDefaultMaxValue(DataClassType dataClassType)
+        public string GetDefaultMinValue(DataClassType type)
         {
-            if (defaults.ContainsKey(dataClassType))
+            if(defaults.ContainsKey(type))
             {
-                return defaults[dataClassType].maximumValue;
+                return defaults[type].minimumValue;
             }
 
-            throw new Exception("No key " + dataClassType.ToString() + " in DataClassRegistry");
+            throw new Exception("No key " + type.ToString() + " in DataClassRegistry");
+        }
+
+        public string GetDefaultMaxValue(DataClassType type)
+        {
+            if (defaults.ContainsKey(type))
+            {
+                return defaults[type].maximumValue;
+            }
+
+            throw new Exception("No key " + type.ToString() + " in DataClassRegistry");
+        }
+
+        public void SetDefaultMinMaxValues(DataClassType type, string minValue, string maxValue)
+        {
+            DefaultValue values = GetEntry(type);
+            values.minimumValue = minValue;
+            values.maximumValue = maxValue;
+            defaults[type] = values;
+        }
+
+        public void SetDefaultCharacters(DataClassType type, string allowedChars, string anomalyChars)
+        {
+            DefaultValue values = GetEntry(type);
+            values.allowedCharacters = allowedChars;
+            values.anomalyCharacters = anomalyChars;
+            defaults[type] = values;
+        }
+
+        // Get existing data or create new DefaultValue-instance
+        private DefaultValue GetEntry(DataClassType type)
+        {
+            if (defaults.ContainsKey(type))
+            {
+                return defaults[type];
+            }
+            else
+            {
+                DefaultValue newValues = new DefaultValue();
+                return newValues;
+            }
         }
     }
 }
