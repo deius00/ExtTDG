@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace ExtTDG
 {
@@ -11,8 +12,6 @@ namespace ExtTDG
 		private int maxValue;
 		private bool hasAnomalies;
 		private bool isUnique;
-
-		// Attributes used in validation
 		private bool minValueOk;
 		private bool maxValueOk;
 
@@ -92,8 +91,8 @@ namespace ExtTDG
 
 			if (this.isUnique)
 			{
-				// Number range must have at least 10 % overhead because of uniqueness
-				if (possibleNumbers < (numItems * 1.1))
+                // Number range must have at least 10 % overhead because of uniqueness
+                if (possibleNumbers < (numItems * 1.1))
                 {
                     errorMessages += "Cannot guarantee uniqueness, expand min/max range\n";
                     result = false;
@@ -181,5 +180,28 @@ namespace ExtTDG
 			numberAsChars[anomalyIndex] = anomalyChars[rng.Next(0, anomalyChars.Length)];
 			return new string(numberAsChars);
         }
+
+		private string GetUniqueAllowedChars(string str)
+		{
+			HashSet<char> lookUpTable = new HashSet<char>();
+			for (int i = 0; i < str.Length; i++)
+			{
+				char c = str[i];
+				if (!lookUpTable.Contains(c))
+				{
+					lookUpTable.Add(c);
+				}
+			}
+
+			int index = 0;
+			char[] uniqueChars = new char[lookUpTable.Count];
+			foreach (char c in lookUpTable)
+			{
+				uniqueChars[index] = c;
+				index++;
+			}
+
+			return new string(uniqueChars);
+		}
 	}
 }

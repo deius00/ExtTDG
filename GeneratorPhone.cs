@@ -87,9 +87,6 @@ namespace ExtTDG
 				BigInteger powResult = System.Numerics.BigInteger.Pow(numUniqueCharacters, this.maxValue);
 				int numPossibilitiesCharacterCount = (int)System.Numerics.BigInteger.Log10(powResult);
 				int numItemsCharacterCount = (int)Math.Log10(numItems);
-
-				Console.WriteLine(numItemsCharacterCount + " / " + numPossibilitiesCharacterCount);
-
 				if (numItemsCharacterCount >= numPossibilitiesCharacterCount)
 				{
 					errorMessages += "Cannot guarantee uniqueness, expand min/max range\n";

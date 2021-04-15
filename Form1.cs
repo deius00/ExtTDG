@@ -106,7 +106,7 @@ namespace ExtTDG
 
             // Set default min/maxvalues for each DataClassType
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Name, "1", "50");
-            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Int32, "0", "100");
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Int32, "0", "1500");
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Email, "5", "50");
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Date, "10000101", "99991231");
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Address, "0", "50");
@@ -191,8 +191,12 @@ namespace ExtTDG
                 foreach (GeneratorParameters gp in m_generatorParameters)
                 {
                     string msg = "";
-                    isValidationOk &= m_generators[gp.dataClassType].Validate(sessionParameters.numItems, out msg);
-                    validationErrorMessages.Add(msg);
+                    bool isGeneratorValid = m_generators[gp.dataClassType].Validate(sessionParameters.numItems, out msg);
+                    isValidationOk &= isGeneratorValid;
+                    if(!isGeneratorValid)
+                    {
+                        validationErrorMessages.Add(msg);
+                    }
                 }
 
                 if (!isValidationOk)
@@ -465,12 +469,12 @@ namespace ExtTDG
         private void ValidateTest()
         {
             dgvGenerators.Rows[0].Cells[0].Value = false;
-            dgvGenerators.Rows[1].Cells[0].Value = false;
+            //dgvGenerators.Rows[1].Cells[0].Value = false;
             dgvGenerators.Rows[2].Cells[0].Value = false;
             dgvGenerators.Rows[3].Cells[0].Value = false;
             dgvGenerators.Rows[4].Cells[0].Value = false;
             dgvGenerators.Rows[5].Cells[0].Value = false;
-            //dgvGenerators.Rows[6].Cells[0].Value = false;
+            dgvGenerators.Rows[6].Cells[0].Value = false;
             dgvGenerators.Rows[7].Cells[0].Value = false;
             dgvGenerators.Rows[8].Cells[0].Value = false;
             tbFilePath.Text = "C:\\Users\\Janne\\Desktop\\Tulokset\\results.xlsx";
