@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Numerics;
 using System.Collections.Generic;
-
 
 namespace ExtTDG
 {
@@ -12,22 +12,86 @@ namespace ExtTDG
 		private int maxValue;
 		private bool hasAnomalies;
 		private bool isUnique;
+		private bool isMinValueOk;
+		private bool isMaxValueOk;
 
-		public GeneratorURL(string allowedChars, string anomalyChars,
+        public object BigInteger { get; private set; }
+
+        public GeneratorURL(string allowedChars, string anomalyChars,
 				string minValue, string maxValue, bool hasAnomalies, bool isUnique)
 		{
 			this.allowedChars = allowedChars;
 			this.anomalyChars = anomalyChars;
-			this.minValue = int.Parse(minValue);
-			this.maxValue = int.Parse(maxValue);
+
+			this.isMinValueOk = int.TryParse(minValue, out this.minValue);
+			this.isMaxValueOk = int.TryParse(maxValue, out this.maxValue);
+
 			this.hasAnomalies = hasAnomalies;
 			this.isUnique = isUnique;
 		}
 
 		public bool Validate(int numItems, out string msg)
         {
-			msg = "GeneratorURL: ";
-			return true;
+			bool result = true;
+			string errorMessages = "";
+
+			// Validate minLength
+			if (!this.isMinValueOk)
+			{
+				errorMessages += "Cannot parse minimum length\n";
+				result = false;
+			}
+
+			if (this.minValue >= maxValue)
+			{
+				errorMessages += "Minimum length cannot be equal or greater than maximum length\n";
+				result = false;
+			}
+
+			// Validate maxLength
+			if (!this.isMaxValueOk)
+			{
+				errorMessages += "Cannot parse minimum length\n";
+				result = false;
+			}
+
+			if (this.maxValue <= this.minValue)
+			{
+				errorMessages += "Maximum length cannot be equal or less than minimum length\n";
+				result = false;
+			}
+
+			// Validate allowed characters
+			if (this.allowedChars == null || this.allowedChars.Length == 0)
+			{
+				errorMessages += "Allowed chars empty\n";
+				result = false;
+			}
+
+			// Validate anomaly characters
+			if (this.anomalyChars == null || this.anomalyChars.Length == 0)
+			{
+				errorMessages += "Anomaly characters empty\n";
+				result = false;
+			}
+
+			// Validate uniqueness and number count (is unique / not unique)
+            if (this.isUnique)
+            {
+				string uniqueAllowedChars = GetUniqueAllowedChars(this.allowedChars);
+				BigInteger numUniqueCharacters = new BigInteger(uniqueAllowedChars.Length);
+				BigInteger powResult = System.Numerics.BigInteger.Pow(numUniqueCharacters, this.maxValue);
+				int numPossibilitiesCharacterCount = (int)System.Numerics.BigInteger.Log10(powResult);
+				int numItemsCharacterCount = (int)Math.Log10(numItems);
+				if (numItemsCharacterCount >= numPossibilitiesCharacterCount)
+				{
+					errorMessages += "Cannot guarantee uniqueness, expand min/max range\n";
+					result = false;
+				}
+			}
+
+            msg = "GeneratorURL: " + errorMessages;
+			return result;
         }
 
 		public List<string> Generate(int numItems, double anomalyChance, Random rng)
@@ -121,5 +185,28 @@ namespace ExtTDG
 			itemAsChars[indexWithAnomaly] = anomalyChars[rng.Next(0, anomalyChars.Length)];
 			return new string(itemAsChars);
        }
+
+		private string GetUniqueAllowedChars(string str)
+        {
+			HashSet<char> lookUpTable = new HashSet<char>();
+			for(int i = 0; i < str.Length; i++)
+            {
+				char c = str[i];
+				if(!lookUpTable.Contains(c))
+                {
+					lookUpTable.Add(c);
+                }
+            }
+
+			int index = 0;
+			char[] uniqueChars = new char[lookUpTable.Count];
+			foreach(char c in lookUpTable)
+            {
+				uniqueChars[index] = c;
+				index++;
+            }
+
+			return new string(uniqueChars);
+        }
 	}
 }
