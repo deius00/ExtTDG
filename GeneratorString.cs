@@ -63,12 +63,14 @@ namespace ExtTDG
             this.uniqueStrings = isUnique;
         }
 
-        public bool Validate(int numItems, out string msg)
-        {
-            msg = "GeneratorString: ";
-            return true;
-        }
 
+        public bool Validate(int numItems, out ValidationResult result)
+        {
+            bool isValid = true;
+            result = new ValidationResult();
+            result.isValid = isValid;
+            return result.isValid;
+        }
 
         public List<string> Generate(int numItems, double anomalyChance, Random rng)
         {

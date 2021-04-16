@@ -186,53 +186,31 @@ namespace ExtTDG
 
                 // Validate generators
                 bool isValidationOk = true;
-                List<string> validationErrorMessages = new List<string>();
+                List<ValidationResult> validationResults = new List<ValidationResult>();
                 foreach (GeneratorParameters gp in m_generatorParameters)
                 {
-                    string msg = "";
-                    bool isGeneratorValid = m_generators[gp.dataClassType].Validate(sessionParameters.numItems, out msg);
+                    ValidationResult result;
+                    bool isGeneratorValid = m_generators[gp.dataClassType].Validate(sessionParameters.numItems, out result);
+                    result.generatorName = "Generator" + gp.dataClassTypeName;
+                    validationResults.Add(result);
                     isValidationOk &= isGeneratorValid;
-                    if(!isGeneratorValid)
-                    {
-                        validationErrorMessages.Add(msg);
-                    }
                 }
 
                 if (!isValidationOk)
                 {
+                    // Output validation errors to log
                     tbLogs.Text = "";
                     tsStatusDuration.Text = "Validation errors. Check logs.";
-                    string[] splitter = { "\n" };
-                    foreach (string genErrorMessage in validationErrorMessages)
+                    foreach(ValidationResult res in validationResults)
                     {
-                        List<string> generatorMessages = new List<string>();
-
-                        // Tokenize generator error messages by newline
-                        string[] tokens = genErrorMessage.Split(splitter, StringSplitOptions.None);
-
-                        // Get generator name from first token
-                        string[] generatorName = tokens[0].Split(':');
-                        string genName = generatorName[0];
-
-                        // Add actual error messages to list
-                        generatorMessages.Add(generatorName[1].Trim());
-                        for(int i = 1; i < tokens.Length; i++)
+                        tbLogs.AppendText(res.generatorName + System.Environment.NewLine);
+                        foreach(string msg in res.messages)
                         {
-                            generatorMessages.Add(tokens[i]);
-                        }
-
-                        // Show generator name separately
-                        tbLogs.AppendText(genName + ":" + System.Environment.NewLine);
-                        for(int i = 0; i < generatorMessages.Count; i++)
-                        {
-                            if(i != (generatorMessages.Count - 1))
-                            {
-                                tbLogs.AppendText("- " + generatorMessages[i] + System.Environment.NewLine);
-                            }
+                            tbLogs.AppendText("- " + msg + System.Environment.NewLine);
                         }
                         tbLogs.AppendText(System.Environment.NewLine);
-                    }
 
+                    }
                     return;
                 }
 

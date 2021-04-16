@@ -55,11 +55,15 @@ namespace ExtTDG
             this.uniqueStrings = isUnique;
         } // Constructor
 
-        public bool Validate(int numItems, out string msg)
+
+        public bool Validate(int numItems, out ValidationResult result)
         {
-            msg = "GeneratorID: ";
-            return true;
+            bool isValid = true;
+            result = new ValidationResult();
+            result.isValid = isValid;
+            return result.isValid;
         }
+
 
 
         // Makes sure that allowed and anomaly chars are not conflicting and updates letters and numbers lists.

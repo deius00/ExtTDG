@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Collections.Generic;
+using ExtTDG.Data;
 
 namespace ExtTDG
 {
@@ -8,89 +9,90 @@ namespace ExtTDG
 	{
 		private string allowedChars;
 		private string anomalyChars;
-		private int minValue;
-		private int maxValue;
+		private int minLength;
+		private int maxLength;
 		private bool hasAnomalies;
 		private bool isUnique;
-		private bool isMinValueOk;
-		private bool isMaxValueOk;
+		private bool isMinLengthOk;
+		private bool isMaxLengthOk;
 
         public GeneratorURL(string allowedChars, string anomalyChars,
-				string minValue, string maxValue, bool hasAnomalies, bool isUnique)
+				string minLength, string maxLength, bool hasAnomalies, bool isUnique)
 		{
 			this.allowedChars = allowedChars;
 			this.anomalyChars = anomalyChars;
 
-			this.isMinValueOk = int.TryParse(minValue, out this.minValue);
-			this.isMaxValueOk = int.TryParse(maxValue, out this.maxValue);
+			this.isMinLengthOk = int.TryParse(minLength, out this.minLength);
+			this.isMaxLengthOk = int.TryParse(maxLength, out this.maxLength);
 
 			this.hasAnomalies = hasAnomalies;
 			this.isUnique = isUnique;
 		}
 
-		public bool Validate(int numItems, out string msg)
-        {
-			bool result = true;
-			string errorMessages = "";
+
+		public bool Validate(int numItems, out ValidationResult result)
+		{
+			bool isValid = true;
+			result = new ValidationResult();
 
 			// Validate minLength
-			if (!this.isMinValueOk)
+			if (!this.isMinLengthOk)
 			{
-				errorMessages += "Cannot parse minimum length\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrParseMinLen);
+				isValid = false;
 			}
 
-			if (this.minValue >= maxValue)
+			if (this.minLength >= maxLength)
 			{
-				errorMessages += "Minimum length cannot be equal or greater than maximum length\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrMinGEMaxLen);
+				isValid = false;
 			}
 
 			// Validate maxLength
-			if (!this.isMaxValueOk)
+			if (!this.isMaxLengthOk)
 			{
-				errorMessages += "Cannot parse minimum length\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrParseMaxLen);
+				isValid = false;
 			}
 
-			if (this.maxValue <= this.minValue)
+			if (this.maxLength <= this.minLength)
 			{
-				errorMessages += "Maximum length cannot be equal or less than minimum length\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrMaxLEMinLen);
+				isValid = false;
 			}
 
 			// Validate allowed characters
 			if (this.allowedChars == null || this.allowedChars.Length == 0)
 			{
-				errorMessages += "Allowed chars empty\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrAllowedCharsEmpty);
+				isValid = false;
 			}
 
 			// Validate anomaly characters
 			if (this.anomalyChars == null || this.anomalyChars.Length == 0)
 			{
-				errorMessages += "Anomaly characters empty\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrAnomalyCharsEmpty);
+				isValid = false;
 			}
 
 			// Validate uniqueness and number count (is unique / not unique)
-            if (this.isUnique)
-            {
+			if (this.isUnique)
+			{
 				string uniqueAllowedChars = GetUniqueAllowedChars(this.allowedChars);
 				BigInteger numUniqueCharacters = new BigInteger(uniqueAllowedChars.Length);
-				BigInteger powResult = System.Numerics.BigInteger.Pow(numUniqueCharacters, this.maxValue);
+				BigInteger powResult = System.Numerics.BigInteger.Pow(numUniqueCharacters, this.maxLength);
 				int numPossibilitiesCharacterCount = (int)System.Numerics.BigInteger.Log10(powResult);
 				int numItemsCharacterCount = (int)Math.Log10(numItems);
 				if (numItemsCharacterCount >= numPossibilitiesCharacterCount)
 				{
-					errorMessages += "Cannot guarantee uniqueness, expand min/max range\n";
-					result = false;
+					result.messages.Add(ErrorText.kErrNoUniqueGuaranteeExpandRange);
+					isValid = false;
 				}
 			}
 
-            msg = "GeneratorURL: " + errorMessages;
-			return result;
-        }
+			result.isValid = isValid;
+			return result.isValid;
+		}
 
 		public List<string> Generate(int numItems, double anomalyChance, Random rng)
 		{
@@ -121,7 +123,7 @@ namespace ExtTDG
 			while (results.Count < numItems)
 			{
 				string prefix = GeneratePrefix(rng, prefixes);
-				string body = GenerateRandomBody(this.minValue, this.maxValue,
+				string body = GenerateRandomBody(this.minLength, this.maxLength,
 					allowedChars, anomalyChars,
 					hasAnomalies, isUnique, rng);
 				string suffix = GenerateSuffix(rng, suffixes);

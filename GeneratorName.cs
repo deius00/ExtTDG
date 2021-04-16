@@ -45,62 +45,63 @@ namespace ExtTDG
             this.uniqueStrings = isUnique;
         }
 
-        public bool Validate(int numItems, out string msg)
+        public bool Validate(int numItems, out ValidationResult result)
         {
-            bool result = true;
-            string errorMessages = "";
+            bool isValid = true;
+            result = new ValidationResult();
 
             // Validate minLength
-            if(this.minLength < 0)
+            if (this.minLength < 0)
             {
-                errorMessages += "Cannot parse minLength\n";
-                result = false;
+                result.messages.Add(ErrorText.kErrParseMinLen);
+                isValid = false;
             }
 
-            if(this.minLength == 0)
+            if (this.minLength == 0)
             {
-                errorMessages += "Minimum length cannot be zero\n";
-                result = false;
+                result.messages.Add(ErrorText.kErrMinNoZeroAllowedLen);
+                isValid = false;
             }
 
-            if(this.minLength >= maxLength)
+            if (this.minLength >= maxLength)
             {
-                errorMessages += "Minimum length cannot be equal or greater than maximum length\n";
-                result = false;
+                result.messages.Add(ErrorText.kErrMinGEMaxLen);
+                isValid = false;
             }
 
             // Validate maxLength
             if (this.maxLength < 0)
             {
-                errorMessages += "Cannot parse maxLength\n";
-                result = false;
+                result.messages.Add(ErrorText.kErrParseMaxLen);
+                isValid = false;
             }
 
-            if(this.maxLength == 0)
+            if (this.maxLength == 0)
             {
-                errorMessages += "Maximum length cannot be zero\n";
-                result = false;
+                result.messages.Add(ErrorText.kErrMaxNoZeroAllowedLen);
+                isValid = false;
             }
 
             if (this.maxLength <= this.minLength)
             {
-                errorMessages += "Maximum length cannot be equal or less than minimum length\n";
-                result = false;
+                result.messages.Add(ErrorText.kErrMaxLEMinLen);
+                isValid = false;
             }
 
             // Validate uniqueness and possible unique item count problem
-            if(this.uniqueStrings)
+            if (this.uniqueStrings)
             {
                 if (maxLength < 8)
                 {
-                    errorMessages += "Cannot guarantee uniqueness, raise maximum length to 8\n";
-                    result = false;
+                    result.messages.Add(ErrorText.kErrNoUniqueGuaranteeRaiseToMaxLen + " 8");
+                    isValid = false;
                 }
             }
 
-            msg = "GeneratorName: " + errorMessages;
-            return result;
+            result.isValid = isValid;
+            return result.isValid;
         }
+
 
         public List<string> Generate(int numItems, double anomalyChance, Random rng)
 		{

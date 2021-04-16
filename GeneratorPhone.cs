@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ExtTDG.Data;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -28,55 +29,55 @@ namespace ExtTDG
 			this.isUnique = isUnique;
 		}
 
-		public bool Validate(int numItems, out string msg)
+		public bool Validate(int numItems, out ValidationResult result)
 		{
-			bool result = true;
-			string errorMessages = "";
+			bool isValid = true;
+			result = new ValidationResult();
 
 			// Validate minLength
 			if (!this.isMinValueOk)
 			{
-				errorMessages += "Cannot parse minimum length\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrParseMinLen);
+				isValid = false;
 			}
 
-			if(this.minValue < 7)
+			if (this.minValue < 7)
 			{
-				errorMessages += "Minimum length cannot be less than 7\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrMinNoLessThanLen + " 7");
+				isValid = false;
 			}
 
 			if (this.minValue > maxValue)
 			{
-				errorMessages += "Minimum length cannot be equal or greater than maximum length\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrMinGEMaxLen);
+				isValid = false;
 			}
 
 			// Validate maxLength
 			if (!this.isMaxValueOk)
 			{
-				errorMessages += "Cannot parse minimum length\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrParseMaxLen);
+				isValid = false;
 			}
 
 			if (this.maxValue < this.minValue)
 			{
-				errorMessages += "Maximum length cannot be equal or less than minimum length\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrMaxLEMinLen);
+				isValid = false;
 			}
 
 			// Validate allowed characters
 			if (this.allowedChars == null || this.allowedChars.Length == 0)
 			{
-				errorMessages += "Allowed chars empty\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrAllowedCharsEmpty);
+				isValid = false;
 			}
 
 			// Validate anomaly characters
 			if (this.anomalyChars == null || this.anomalyChars.Length == 0)
 			{
-				errorMessages += "Anomaly characters empty\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrAnomalyCharsEmpty);
+				isValid = false;
 			}
 
 			// Validate uniqueness and number count (is unique / not unique)
@@ -89,13 +90,13 @@ namespace ExtTDG
 				int numItemsCharacterCount = (int)Math.Log10(numItems);
 				if (numItemsCharacterCount >= numPossibilitiesCharacterCount)
 				{
-					errorMessages += "Cannot guarantee uniqueness, expand min/max range\n";
-					result = false;
+					result.messages.Add(ErrorText.kErrNoUniqueGuaranteeExpandRange);
+					isValid = false;
 				}
 			}
 
-			msg = "GeneratorPhone: " + errorMessages;
-			return result;
+			result.isValid = isValid;
+			return result.isValid;
 		}
 
 

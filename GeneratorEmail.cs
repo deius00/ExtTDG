@@ -89,46 +89,47 @@ namespace ExtTDG
             this.uniqueStrings = isUnique;
         }
 
-        public bool Validate(int numItems, out string msg)
+        public bool Validate(int numItems, out ValidationResult result)
         {
-            bool result = true;
-            string errorMessages = "";
+            bool isValid = true;
+            result = new ValidationResult();
 
             // Validate minimum length
-            if(!this.minLengthOk)
+            if (!this.minLengthOk)
             {
-                errorMessages += "Cannot parse minimum length\n";
-                result = false;
+                result.messages.Add(ErrorText.kErrParseMinLen);
+                isValid = false;
             }
 
             if (this.minLength < 0)
             {
-                errorMessages += "Minimum length less than zero\n";
-                result = false;
+                result.messages.Add(ErrorText.kErrMinLZeroLen);
+                isValid = false;
             }
 
-            if(this.minLength >= this.maxLength)
+            if (this.minLength >= this.maxLength)
             {
-                errorMessages += "Minimum length is greater or equal than maximum length\n";
-                result = false;
+                result.messages.Add(ErrorText.kErrMinGEMaxLen);
+                isValid = false;
             }
 
             // Validate maximum length
             if (!this.maxLengthOk)
             {
-                errorMessages += "Cannot parse maximum length\n";
-                result = false;
+                result.messages.Add(ErrorText.kErrParseMaxLen);
+                isValid = false;
             }
 
-            if(this.maxLength < this.minLength)
+            if (this.maxLength < this.minLength)
             {
-                errorMessages += "Maximum length less or equal than minimum length\n";
-                result = false;
+                result.messages.Add(ErrorText.kErrMaxLEMinLen);
+                isValid = false;
             }
 
-            msg = "GeneratorEmail: " + errorMessages;
-            return result;
+            result.isValid = isValid;
+            return result.isValid;
         }
+
 
         public List<string> Generate(int numItems, double anomalyChance, Random rng)
         {

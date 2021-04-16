@@ -29,12 +29,13 @@ namespace ExtTDG
             this.uniqueDates = isUnique;
         }
 
-        public bool Validate(int numItems, out string msg)
+        public bool Validate(int numItems, out ValidationResult result)
         {
-            msg = "GeneratorDate: ";
-            return true;
+            bool isValid = true;
+            result = new ValidationResult();
+            result.isValid = isValid;
+            return result.isValid;
         }
-
 
         public void SetDateFormat(string formatStr)
         {

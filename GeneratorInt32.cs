@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ExtTDG.Data;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -28,63 +29,63 @@ namespace ExtTDG
 			this.isUnique = isUnique;
 		}
 
-		public bool Validate(int numItems, out string msg)
+		public bool Validate(int numItems, out ValidationResult result)
 		{
-			bool result = true;
-			string errorMessages = "";
+			bool isValid = true;
+			result = new ValidationResult();
 
 			// Validate minLength
-			if(!this.minValueOk)
-            {
-				errorMessages += "Cannot parse minimum length\n";
-				result = false;
+			if (!this.minValueOk)
+			{
+				result.messages.Add(ErrorText.kErrParseMinLen);
+				isValid = false;
 			}
 
 			if (this.minValue >= maxValue)
 			{
-				errorMessages += "Minimum length cannot be equal or greater than maximum length\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrMinGEMaxLen);
+				isValid = false;
 			}
 
 			// Validate maxLength
 			if (!this.maxValueOk)
 			{
-				errorMessages += "Cannot parse minimum length\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrParseMaxLen);
+				isValid = false;
 			}
 
 			if (this.maxValue <= this.minValue)
 			{
-				errorMessages += "Maximum length cannot be equal or less than minimum length\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrMaxLEMinLen);
+				isValid = false;
 			}
 
 			// Validate allowed characters
 			if (this.allowedChars == null || this.allowedChars.Length == 0)
 			{
-				errorMessages += "Allowed chars empty\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrAllowedCharsEmpty);
+				isValid = false;
 			}
 
 			// Validate anomaly characters
 			if (this.anomalyChars == null || this.anomalyChars.Length == 0)
 			{
-				errorMessages += "Anomaly characters empty\n";
-				result = false;
+				result.messages.Add(ErrorText.kErrAnomalyCharsEmpty);
+				isValid = false;
 			}
 
 			// Validate uniqueness and number count (is unique / not unique)
 			int possibleNumbers = 0;
-			if(result)
-            {
+			if (isValid)
+			{
 				int minVal = Math.Min(this.minValue, this.maxValue);
 				int maxVal = Math.Max(this.minValue, this.maxValue);
-				if(minVal < 0 && maxVal < 0)
-                {
+				if (minVal < 0 && maxVal < 0)
+				{
 					possibleNumbers = Math.Abs(minVal - maxVal);
 				}
-                else
-                {
+				else
+				{
 					possibleNumbers = Math.Abs(maxVal - minVal);
 				}
 			}
@@ -92,25 +93,26 @@ namespace ExtTDG
 
 			if (this.isUnique)
 			{
-                // Number range must have at least 10 % overhead because of uniqueness
-                if (possibleNumbers < (numItems * 1.1))
-                {
-                    errorMessages += "Cannot guarantee uniqueness, expand min/max range\n";
-                    result = false;
-                }
+				// Number range must have at least 10 % overhead because of uniqueness
+				if (possibleNumbers < (numItems * 1.1))
+				{
+					result.messages.Add(ErrorText.kErrNoUniqueGuaranteeExpandRange);
+					isValid = false;
+				}
 			}
 			else
-            {
+			{
 				if (possibleNumbers < numItems)
 				{
-					errorMessages += "Too many items, expand min/max range\n";
-					result = false;
+					result.messages.Add(ErrorText.kErrTooManyItems);
+					isValid = false;
 				}
 			}
 
-			msg = "GeneratorInt32: " + errorMessages;
-			return result;
+			result.isValid = isValid;
+			return result.isValid;
 		}
+
 
 		public List<string> Generate(int numItems, double anomalyChance, Random rng)
 		{
