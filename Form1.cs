@@ -81,7 +81,7 @@ namespace ExtTDG
                 "!#¤%&()?/;:,_<>|£${[]}*");
             
             m_dataClassRegistry.SetDefaultCharacters(DataClassType.Date,
-                "012",
+                "0",
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#¤%&()?;:,_<>|@£${[]}");
             
             m_dataClassRegistry.SetDefaultCharacters(DataClassType.Address,
@@ -473,9 +473,9 @@ namespace ExtTDG
         private void ValidateTest()
         {
             dgvGenerators.Rows[0].Cells[0].Value = false;
-            //dgvGenerators.Rows[1].Cells[0].Value = false;
+            dgvGenerators.Rows[1].Cells[0].Value = false;
             dgvGenerators.Rows[2].Cells[0].Value = false;
-            dgvGenerators.Rows[3].Cells[0].Value = false;
+            //dgvGenerators.Rows[3].Cells[0].Value = false;
             dgvGenerators.Rows[4].Cells[0].Value = false;
             dgvGenerators.Rows[5].Cells[0].Value = false;
             dgvGenerators.Rows[6].Cells[0].Value = false;

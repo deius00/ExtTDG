@@ -1,3 +1,4 @@
+using ExtTDG.Data;
 using System;
 using System.Collections.Generic;
 
@@ -5,9 +6,12 @@ namespace ExtTDG
 {
 	public class GeneratorDate : IGenerator
     {
-        private int dateFormat = 0; 
-        private string anomalyChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#¤%&()?;:,_<>|@£${[]}"; 
-        private DateTime minDate; 
+        private int dateFormat = 0;
+        private string allowedChars;
+        private string anomalyChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#¤%&()?;:,_<>|@£${[]}";
+        private string minValue;
+        private string maxValue;
+        private DateTime minDate;
         private DateTime maxDate; 
         private bool hasAnomalies; 
         private bool uniqueDates;
@@ -18,13 +22,10 @@ namespace ExtTDG
         public GeneratorDate(string allowedChars, string anomalyChars, 
                 string minValue, string maxValue, bool hasAnomalies, bool isUnique) 
         {
-            SetDateFormat(allowedChars);
-            if (!String.IsNullOrWhiteSpace(anomalyChars))
-            {
-                this.anomalyChars = anomalyChars;
-            }
-            SetMinDate(minValue);
-            SetMaxDate(maxValue);
+            this.allowedChars = allowedChars;
+            this.anomalyChars = anomalyChars;
+            this.minValue = minValue;
+            this.maxValue = maxValue;
             this.hasAnomalies = hasAnomalies;
             this.uniqueDates = isUnique;
         }
@@ -33,58 +34,173 @@ namespace ExtTDG
         {
             bool isValid = true;
             result = new ValidationResult();
+
+            // Check anomaly chars
+            if((this.anomalyChars == null) || (anomalyChars.Length == 0))
+            {
+                result.messages.Add(ErrorText.kErrAnomalyCharsEmpty);
+                isValid = false;
+            }
+
+            // Check date format
+            int parsedDateFormat = 0;
+            if (CheckDateFormat(allowedChars, out parsedDateFormat))
+            {
+                // Set valid dateformat
+                this.dateFormat = parsedDateFormat;
+            }
+            else
+            {
+                result.messages.Add("Invalid date format.");
+                isValid = false;
+            }
+
+            // Validate min date
+            DateTime parsedMinDate;
+            if (CheckMinDate(minValue, out parsedMinDate))
+            {
+                // Set valid minDate
+                this.minDate = parsedMinDate;
+                this.specifiedRange = true;
+            }
+            else
+            {
+                result.messages.Add("Invalid min date");
+                isValid = false;
+            }
+
+            // Validate max date
+            DateTime parsedMaxDate;
+            if (CheckMaxDate(maxValue, out parsedMaxDate))
+            {
+                this.maxDate = parsedMaxDate;
+                this.specifiedRange = true;
+            }
+            else
+            {
+                result.messages.Add("Invalid max date");
+                isValid = false;
+            }
+
             result.isValid = isValid;
             return result.isValid;
         }
 
-        public void SetDateFormat(string formatStr)
+        private bool CheckDateFormat(string format, out int parsedResult)
         {
-            int temp;
-            try {
-                temp = Int32.Parse(formatStr);
-                if (temp == 1 || temp == 2) 
-                {
-                    this.dateFormat = temp;
-                }
-            } catch (Exception e)
+            bool isFormatOk = int.TryParse(format, out parsedResult);
+            if (!isFormatOk)
             {
-                Console.WriteLine("Given date format not recognized, default will be used.");
+                parsedResult = 0;
+                return false;
             }
+
+            if ((parsedResult == 0) || (parsedResult == 1) || (parsedResult == 2))
+            {
+                return true;
+            }
+
+            return false;
         }
 
-        public void SetMinDate(string minDate)
+        private bool CheckMinDate(string minDate, out DateTime parsedResult)
         {
-            try 
-            {
-                int date = Int32.Parse(minDate);
-                int year = date / 10000;
-                int month = (date - year*10000) / 100;
-                int day = date - year*10000 - month*100;
+            bool isMinDateOk = true;
+            int date = 0;
+            bool isDateOk = int.TryParse(minDate, out date);
 
-                this.minDate = new DateTime(year, month, day);  // trhows an exception if not possible
-                this.specifiedRange = true;
-            } catch (Exception e)
+            int year = date / 10000;
+            int month = (date - year * 10000) / 100;
+            int day = date - year * 10000 - month * 100;
+
+            try
             {
-                this.minDate = new DateTime(1000, 1, 1);
+                parsedResult = new DateTime(year, month, day);
+                isMinDateOk = true;
             }
+            catch (Exception e)
+            {
+                // Invalid DateTime
+                parsedResult = new DateTime(1000, 1, 1);
+                isMinDateOk = false;
+            }
+
+            return isMinDateOk;
         }
 
-        public void SetMaxDate(string maxDate)
+        private bool CheckMaxDate(string maxDate, out DateTime parsedResult)
         {
-            try 
-            {
-                int date = Int32.Parse(maxDate);
-                int year = date / 10000;
-                int month = (date - year*10000) / 100;
-                int day = date - year*10000 - month*100;
+            bool isMaxDateOk = true;
+            int date = 0;
+            bool isDateOk = int.TryParse(maxDate, out date);
+            int year = date / 10000;
+            int month = (date - year * 10000) / 100;
+            int day = date - year * 10000 - month * 100;
 
-                this.maxDate = new DateTime(year, month, day);  // trhows an exception if not possible
-                this.specifiedRange = true;
-            } catch (Exception e)
+            try
             {
-                this.maxDate = new DateTime(9999, 12, 31);
+                parsedResult = new DateTime(year, month, day);
+                isMaxDateOk = true;
             }
+            catch (Exception e)
+            {
+                // Invalid DateTime
+                parsedResult = new DateTime(9999, 12, 31);
+                isMaxDateOk = false;
+            }
+
+            return isMaxDateOk;
         }
+
+
+        //public void SetDateFormat(string formatStr)
+        //{
+        //    int temp;
+        //    try {
+        //        temp = Int32.Parse(formatStr);
+        //        if (temp == 1 || temp == 2) 
+        //        {
+        //            this.dateFormat = temp;
+        //        }
+        //    } catch (Exception e)
+        //    {
+        //        Console.WriteLine("Given date format not recognized, default will be used.");
+        //    }
+        //}
+
+        //public void SetMinDate(string minDate)
+        //{
+        //    try 
+        //    {
+        //        int date = Int32.Parse(minDate);
+        //        int year = date / 10000;
+        //        int month = (date - year*10000) / 100;
+        //        int day = date - year*10000 - month*100;
+
+        //        this.minDate = new DateTime(year, month, day);  // trhows an exception if not possible
+        //        this.specifiedRange = true;
+        //    } catch (Exception e)
+        //    {
+        //        this.minDate = new DateTime(1000, 1, 1);
+        //    }
+        //}
+
+        //public void SetMaxDate(string maxDate)
+        //{
+        //    try 
+        //    {
+        //        int date = Int32.Parse(maxDate);
+        //        int year = date / 10000;
+        //        int month = (date - year*10000) / 100;
+        //        int day = date - year*10000 - month*100;
+
+        //        this.maxDate = new DateTime(year, month, day);  // trhows an exception if not possible
+        //        this.specifiedRange = true;
+        //    } catch (Exception e)
+        //    {
+        //        this.maxDate = new DateTime(9999, 12, 31);
+        //    }
+        //}
 
         private void CheckLimitDates()
         {

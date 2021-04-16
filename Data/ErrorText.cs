@@ -24,7 +24,6 @@ namespace ExtTDG.Data
         public static readonly string kErrMinNoLessThanLen = "Minimum length cannot be less than ";
         public static readonly string kErrMinNoLessThanVal = "Minimum value cannot be less than ";
 
-
         // Maximum length / value error texts
         public static readonly string kErrParseMaxLen = "Cannot parse maximum length";
         public static readonly string kErrParseMaxVal = "Cannot parse maximum value";

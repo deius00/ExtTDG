@@ -12,6 +12,8 @@ namespace ExtTDG
 		private int maxValue;
 		private bool hasAnomalies;
 		private bool isUnique;
+		private bool isMinValueOk;
+		private bool isMaxValueOk;
 
 		public GeneratorAddress(string allowedChars, string anomalyChars,
 				string minValue, string maxValue, bool hasAnomalies, bool isUnique)
@@ -20,10 +22,10 @@ namespace ExtTDG
 			this.anomalyChars = anomalyChars;
 
 			this.minValue = 0;
-			int.TryParse(minValue, out this.minValue);
+			this.isMinValueOk = int.TryParse(minValue, out this.minValue);
 
 			this.maxValue = 0;
-			int.TryParse(maxValue, out this.maxValue);
+			this.isMaxValueOk = int.TryParse(maxValue, out this.maxValue);
 
 			this.hasAnomalies = hasAnomalies;
 			this.isUnique = isUnique;
@@ -34,6 +36,47 @@ namespace ExtTDG
 		{
 			bool isValid = true;
 			result = new ValidationResult();
+
+			// Validate minLength
+			if (!this.isMinValueOk)
+			{
+				result.messages.Add(ErrorText.kErrParseMinLen);
+				isValid = false;
+			}
+
+			if (this.minValue >= maxValue)
+			{
+				result.messages.Add(ErrorText.kErrMinGEMaxLen);
+				isValid = false;
+			}
+
+			// Validate maxLength
+			if (!this.isMaxValueOk)
+			{
+				result.messages.Add(ErrorText.kErrParseMaxLen);
+				isValid = false;
+			}
+
+			if (this.maxValue <= this.minValue)
+			{
+				result.messages.Add(ErrorText.kErrMaxLEMinLen);
+				isValid = false;
+			}
+
+			// Validate allowed characters
+			if (this.allowedChars == null || this.allowedChars.Length == 0)
+			{
+				result.messages.Add(ErrorText.kErrAllowedCharsEmpty);
+				isValid = false;
+			}
+
+			// Validate anomaly characters
+			if (this.anomalyChars == null || this.anomalyChars.Length == 0)
+			{
+				result.messages.Add(ErrorText.kErrAnomalyCharsEmpty);
+				isValid = false;
+			}
+
 			result.isValid = isValid;
 			return result.isValid;
 		}
