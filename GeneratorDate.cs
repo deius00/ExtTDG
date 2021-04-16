@@ -34,6 +34,7 @@ namespace ExtTDG
         {
             bool isValid = true;
             result = new ValidationResult();
+            bool minMaxOk = true;
 
             // Check anomaly chars
             if((this.anomalyChars == null) || (anomalyChars.Length == 0))
@@ -67,6 +68,7 @@ namespace ExtTDG
             {
                 result.messages.Add("Invalid min date");
                 isValid = false;
+                minMaxOk = false;
             }
 
             // Validate max date
@@ -80,6 +82,29 @@ namespace ExtTDG
             {
                 result.messages.Add("Invalid max date");
                 isValid = false;
+                minMaxOk = false;
+            }
+
+            // Validate order of limit dates
+            if (minMaxOk && this.minDate.CompareTo(this.maxDate) > 0) 
+            {
+                result.messages.Add("Minimum date after maximum date");
+                isValid = false;
+            }
+
+            // Validate availability of unique dates.
+            if (this.uniqueDates)
+            {
+                if (numItems > 1000000)
+                {
+                    result.messages.Add("Cannot generate more than 1 000 000 unique dates");
+                    isValid = false;
+                } 
+                else if (minMaxOk && this.maxDate.CompareTo(this.minDate) <= 2 * numItems)
+                {
+                    result.messages.Add(ErrorText.kErrNoUniqueGuaranteeExpandRange);
+                    isValid = false;
+                }
             }
 
             result.isValid = isValid;
@@ -202,37 +227,37 @@ namespace ExtTDG
         //    }
         //}
 
-        private void CheckLimitDates()
-        {
-            if (this.minDate.CompareTo(this.maxDate) > 0)
-            {
-                this.minDate = new DateTime(1000, 1, 1);
-                this.maxDate = new DateTime(9999, 12, 31);
-                this.specifiedRange = false;
-            }
-        }
+        //private void CheckLimitDates()
+        //{
+        //    if (this.minDate.CompareTo(this.maxDate) > 0)
+        //    {
+        //        this.minDate = new DateTime(1000, 1, 1);
+        //        this.maxDate = new DateTime(9999, 12, 31);
+        //        this.specifiedRange = false;
+        //    }
+        //}
 
-        private void CheckAmountOfOptionsForUnique(int amount)
-        {
-            if (amount > 100000)
-            {
-                this.uniqueDates = false;
-            }
-            else if (this.maxDate.CompareTo(this.minDate) <= 2*amount)
-            {
-                this.minDate = new DateTime(1000, 1, 1);
-                this.maxDate = new DateTime(9999, 12, 31);
-                this.specifiedRange = false;
-            }
-        }
+        //private void CheckAmountOfOptionsForUnique(int amount)
+        //{
+        //    if (amount > 100000)
+        //    {
+        //        this.uniqueDates = false;
+        //    }
+        //    else if (this.maxDate.CompareTo(this.minDate) <= 2*amount)
+         //   {
+         //       this.minDate = new DateTime(1000, 1, 1);
+         //       this.maxDate = new DateTime(9999, 12, 31);
+         //       this.specifiedRange = false;
+         //   }
+        //}
 
         public List<string> Generate(int numItems, double anomalyChance, Random rng)
 		{
 			HashSet<string> alreadyGenerated = new HashSet<string>();
 			List<string> results = new List<string>();
 
-            CheckLimitDates();
-            CheckAmountOfOptionsForUnique(numItems);
+            //CheckLimitDates();
+            //CheckAmountOfOptionsForUnique(numItems);
             double anomalyProb = 0;
             if (this.hasAnomalies)
             {
