@@ -223,10 +223,14 @@ namespace ExtTDG
 
                         // Show generator name separately
                         tbLogs.AppendText(genName + ":" + System.Environment.NewLine);
-                        foreach (string newText in generatorMessages)
+                        for(int i = 0; i < generatorMessages.Count; i++)
                         {
-                            tbLogs.AppendText(newText + System.Environment.NewLine);
+                            if(i != (generatorMessages.Count - 1))
+                            {
+                                tbLogs.AppendText("- " + generatorMessages[i] + System.Environment.NewLine);
+                            }
                         }
+                        tbLogs.AppendText(System.Environment.NewLine);
                     }
 
                     return;
