@@ -1,5 +1,7 @@
-﻿using System;
+﻿using ExtTDG.Data;
+using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace ExtTDG
 {
@@ -11,6 +13,8 @@ namespace ExtTDG
         private int maxLength;
         private bool hasAnomalies;
         private bool uniqueStrings;
+        private bool isMinLengthOk;
+        private bool isMaxLengthOk;
 
         private string letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private string numbers = "0123456789";
@@ -18,39 +22,12 @@ namespace ExtTDG
         public GeneratorID(string allowedChars, string anomalyChars,
                 string minValue, string maxValue, bool hasAnomalies, bool isUnique)
         {
-            SetAllowedAndAnomalyChars(allowedChars, anomalyChars);
-            
-            try
-            {
-                this.minLength = Int32.Parse(minValue);
-                if (this.minLength <= 0)
-                {
-                    this.minLength = 3;
-                }
-            }
-            catch (Exception e)
-            {
-                this.minLength = 3;
-            }
-            try
-            {
-                this.maxLength = Int32.Parse(maxValue);
-                if (this.maxLength < this.minLength)
-                {
-                    if (this.minLength >= 6)
-                    {
-                        this.maxLength = this.minLength;
-                    }
-                    else
-                    {
-                        this.maxLength = 6;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                this.maxLength = 6;
-            }
+            this.allowedChars = allowedChars;
+            this.anomalyChars = anomalyChars;
+
+            this.isMinLengthOk = int.TryParse(minValue, out this.minLength);
+            this.isMaxLengthOk = int.TryParse(maxValue, out this.maxLength);
+
             this.hasAnomalies = hasAnomalies;
             this.uniqueStrings = isUnique;
         } // Constructor
@@ -60,64 +37,163 @@ namespace ExtTDG
         {
             bool isValid = true;
             result = new ValidationResult();
+
+            if(allowedChars == null || allowedChars.Length == 0)
+            {
+                result.messages.Add(ErrorText.kErrAllowedCharsEmpty);
+                isValid = false;
+            }
+
+            if(anomalyChars == null || anomalyChars.Length == 0)
+            {
+                result.messages.Add(ErrorText.kErrAnomalyCharsEmpty);
+                isValid = false;
+            }
+
+            // Validate allowed and anomaly characters
+            // so check that these sets do not contain
+            // same characters
+            if (isValid)
+            {
+                if (!CheckCharactersIntersection(this.allowedChars, this.anomalyChars))
+                {
+                    result.messages.Add("Same characters in allowed and anomaly characters");
+                    isValid = false;
+                }
+            }
+
+            // Validate min length
+            if(!isMinLengthOk)
+            {
+                result.messages.Add(ErrorText.kErrParseMinLen);
+                isValid = false;
+            }
+
+            // Validate max length
+            if(!isMaxLengthOk)
+            {
+                result.messages.Add(ErrorText.kErrParseMaxLen);
+                isValid = false;
+            }
+
+            // Validate min/max swap
+            if(isValid)
+            {
+                if (this.minLength >= this.maxLength)
+                {
+                    result.messages.Add(ErrorText.kErrMinGEMaxLen);
+                    isValid = false;
+                }
+
+                if (this.maxLength <= this.minLength)
+                {
+                    result.messages.Add(ErrorText.kErrMaxLEMinLen);
+                    isValid = false;
+                }
+            }
+
+            // Validate uniqueness and number count (is unique / not unique)
+            if (this.uniqueStrings)
+            {
+                string uniqueAllowedChars = GetUniqueAllowedChars(this.allowedChars);
+                BigInteger numUniqueCharacters = new BigInteger(uniqueAllowedChars.Length);
+                BigInteger numPossibilities = System.Numerics.BigInteger.Pow(numUniqueCharacters, this.maxLength);
+                int numPossibilitiesCharacterCount = (int)System.Numerics.BigInteger.Log10(numPossibilities);
+                int numItemsCharacterCount = (int)Math.Log10(numItems);
+                if (numItemsCharacterCount >= numPossibilitiesCharacterCount)
+                {
+                    result.messages.Add(ErrorText.kErrNoUniqueGuaranteeExpandRange);
+                    isValid = false;
+                }
+            }
+            else
+            {
+                string uniqueAllowedChars = GetUniqueAllowedChars(this.allowedChars);
+                BigInteger numUniqueCharacters = new BigInteger(uniqueAllowedChars.Length);
+                BigInteger numPossibilities = System.Numerics.BigInteger.Pow(numUniqueCharacters, this.maxLength);
+                BigInteger biNumItems = new BigInteger(numItems);
+                if (biNumItems > numPossibilities)
+                {
+                    result.messages.Add(ErrorText.kErrTooManyItems);
+                    isValid = false;
+                }
+            }
+
+            // Modify letters and numbers if valid
+            if (isValid)
+            {
+                // Allowed characters and anomaly characters are guaranteed to have
+                // at least length of 1
+                HashSet<char> allowedCharacterSet = new HashSet<char>(this.allowedChars.ToCharArray());
+                List<char> allowedLetterList = new List<char>();
+                List<char> allowedNumberList = new List<char>();
+
+                // Create list of letters that are used
+                // in allowed letters
+                foreach(char c in this.letters)
+                {
+                    if(allowedCharacterSet.Contains(c))
+                    {
+                        allowedLetterList.Add(c);
+                    }
+                }
+
+                // Create list of numbers that are used
+                // in allowed characters
+                foreach(char c in this.numbers)
+                {
+                    if(allowedCharacterSet.Contains(c))
+                    {
+                        allowedNumberList.Add(c);
+                    }
+                }
+
+                // Create new lists of allowed letters and numbers
+                int letterIndex = 0;
+                char[] newAllowedLetters = new char[allowedLetterList.Count];
+                foreach(char c in allowedLetterList)
+                {
+                    newAllowedLetters[letterIndex] = c;
+                    letterIndex++;
+                }
+
+                char[] newAllowedNumbers = new char[allowedNumberList.Count];
+                int numberIndex = 0;
+                foreach(char c in allowedNumberList)
+                {
+                    newAllowedNumbers[numberIndex] = c;
+                    numberIndex++;
+                }
+
+                this.letters = new string(newAllowedLetters);
+                this.numbers = new string(newAllowedNumbers);
+            }
+
             result.isValid = isValid;
             return result.isValid;
         }
 
-
-
-        // Makes sure that allowed and anomaly chars are not conflicting and updates letters and numbers lists.
-        public void SetAllowedAndAnomalyChars(string allowedChars, string anomalyChars)
+        private bool CheckCharactersIntersection(string s1, string s2)
         {
-            HashSet<char> allowed = new HashSet<char>(this.allowedChars.ToCharArray());
-            HashSet<char> anom = new HashSet<char>(this.anomalyChars.ToCharArray());
-            HashSet<char> lett = new HashSet<char>(this.letters.ToCharArray());
-            HashSet<char> num = new HashSet<char>(this.numbers.ToCharArray());
+            HashSet<char> set1 = new HashSet<char>();
+            HashSet<char> set2 = new HashSet<char>();
 
-            if (!String.IsNullOrWhiteSpace(allowedChars))
-            {
-                allowed = new HashSet<char>(allowedChars.ToCharArray());
-            }
-            if (!String.IsNullOrWhiteSpace(anomalyChars))
-            {
-                anom = new HashSet<char>(anomalyChars.ToCharArray());
-            }
+            foreach (char c in s1)
+                set1.Add(c);
 
-            foreach (char c in allowed)
+            foreach (char c in s2)
+                set2.Add(c);
+
+            foreach(char c in set1)
             {
-               anom.Remove(c);
-            }
-            foreach (char c in this.letters)
-            {
-                if (!allowed.Contains(c))
-                    lett.Remove(c);
-            }
-            foreach (char c in this.numbers)
-            {
-                if (!allowed.Contains(c))
-                    num.Remove(c);
+                if(set2.Contains(c))
+                {
+                    return false;
+                }
             }
 
-            this.allowedChars = "";
-            this.allowedChars = "";
-            this.letters = "";
-            this.numbers = "";
-
-            foreach (char c in allowed)
-                this.allowedChars += c;
-            foreach (char c in anom)
-                this.anomalyChars += c;
-            foreach (char c in lett)
-                this.letters += c;
-            foreach (char c in num)
-                this.numbers += c;
-
-
-            if (this.anomalyChars.Length == 0)
-            {
-                this.anomalyChars = "*";
-            }
-        } // SetAllowedAndAnomalyChars()
+            return true;
+        }
 
         public List<string> Generate(int numItems, double anomalyChance, Random rng)
         {
@@ -128,23 +204,6 @@ namespace ExtTDG
             if (!this.hasAnomalies)
             {
                 anomalyProb = 0;
-            }
-
-            // Revert to default allowed chars if trying to generate too much unique IDs with to few chars.
-            if (this.uniqueStrings && this.allowedChars.Length < 10 && numItems > 1000000)
-            {
-                this.allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-                this.anomalyChars = "!#¤%&()?/;.:,_-<>|@£${[]}*";
-                this.letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                this.numbers = "0123456789";
-                Console.WriteLine("Too few allowed characters and large amount of unique IDs. Reverting to default allowed characters.");
-            }
-
-            // Increase max length if trying to generate too many unique but short IDs
-            if (Math.Log(2 * numItems, this.allowedChars.Length) > this.maxLength)
-            {
-                this.maxLength = 2 * (int)Math.Log(2 * numItems, this.allowedChars.Length);
-                Console.WriteLine("Too much unique but short IDs. Maximum length of the ID increased to " + this.maxLength.ToString());
             }
 
             // Generate IDs
@@ -219,5 +278,28 @@ namespace ExtTDG
 
             return id;
         } // GenerateOneID()
+
+        private string GetUniqueAllowedChars(string str)
+        {
+            HashSet<char> lookUpTable = new HashSet<char>();
+            for (int i = 0; i < str.Length; i++)
+            {
+                char c = str[i];
+                if (!lookUpTable.Contains(c))
+                {
+                    lookUpTable.Add(c);
+                }
+            }
+
+            int index = 0;
+            char[] uniqueChars = new char[lookUpTable.Count];
+            foreach (char c in lookUpTable)
+            {
+                uniqueChars[index] = c;
+                index++;
+            }
+
+            return new string(uniqueChars);
+        }
     }
 }

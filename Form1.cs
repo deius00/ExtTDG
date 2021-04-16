@@ -475,11 +475,11 @@ namespace ExtTDG
             dgvGenerators.Rows[0].Cells[0].Value = false;
             dgvGenerators.Rows[1].Cells[0].Value = false;
             dgvGenerators.Rows[2].Cells[0].Value = false;
-            //dgvGenerators.Rows[3].Cells[0].Value = false;
+            dgvGenerators.Rows[3].Cells[0].Value = false;
             dgvGenerators.Rows[4].Cells[0].Value = false;
             dgvGenerators.Rows[5].Cells[0].Value = false;
             dgvGenerators.Rows[6].Cells[0].Value = false;
-            dgvGenerators.Rows[7].Cells[0].Value = false;
+            //dgvGenerators.Rows[7].Cells[0].Value = false;
             dgvGenerators.Rows[8].Cells[0].Value = false;
             tbFilePath.Text = "C:\\Users\\janne\\Desktop\\results\\results.xlsx";
             cbAllowOverwrite.Checked = true;
