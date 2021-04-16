@@ -202,24 +202,30 @@ namespace ExtTDG
                 {
                     tbLogs.Text = "";
                     tsStatusDuration.Text = "Validation errors. Check logs.";
-
                     string[] splitter = { "\n" };
-                    foreach (string s in validationErrorMessages)
+                    foreach (string genErrorMessage in validationErrorMessages)
                     {
-                        // Tokenize string
-                        string[] msg = s.Split(splitter, StringSplitOptions.None);
-                        string[] generatorName = msg[0].Split(':');
-                        for(int i = 0; i < msg.Length; i++)
+                        List<string> generatorMessages = new List<string>();
+
+                        // Tokenize generator error messages by newline
+                        string[] tokens = genErrorMessage.Split(splitter, StringSplitOptions.None);
+
+                        // Get generator name from first token
+                        string[] generatorName = tokens[0].Split(':');
+                        string genName = generatorName[0];
+
+                        // Add actual error messages to list
+                        generatorMessages.Add(generatorName[1].Trim());
+                        for(int i = 1; i < tokens.Length; i++)
                         {
-                            if(i == 0)
-                            {
-                                // Show generator name separately
-                                tbLogs.AppendText(generatorName[0] + ":" + System.Environment.NewLine);
-                            }
-                            else
-                            {
-                                tbLogs.AppendText(msg[i] + System.Environment.NewLine);
-                            }
+                            generatorMessages.Add(tokens[i]);
+                        }
+
+                        // Show generator name separately
+                        tbLogs.AppendText(genName + ":" + System.Environment.NewLine);
+                        foreach (string newText in generatorMessages)
+                        {
+                            tbLogs.AppendText(newText + System.Environment.NewLine);
                         }
                     }
 

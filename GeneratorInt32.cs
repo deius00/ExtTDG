@@ -89,6 +89,7 @@ namespace ExtTDG
 				}
 			}
 
+
 			if (this.isUnique)
 			{
                 // Number range must have at least 10 % overhead because of uniqueness
@@ -97,8 +98,8 @@ namespace ExtTDG
                     errorMessages += "Cannot guarantee uniqueness, expand min/max range\n";
                     result = false;
                 }
-            }
-            else
+			}
+			else
             {
 				if (possibleNumbers < numItems)
 				{
