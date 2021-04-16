@@ -94,6 +94,40 @@ namespace ExtTDG
             bool isValid = true;
             result = new ValidationResult();
 
+            if (allowedChars == null || allowedChars.Length == 0)
+            {
+                result.messages.Add(ErrorText.kErrAllowedCharsEmpty);
+                isValid = false;
+            }
+            else
+            {
+                if (allowedChars.Contains("@")) 
+                {
+                    result.messages.Add("Character '@' not in allowed characters");
+                    isValid = false;
+                }
+                if (allowedChars.Contains("."))
+                {
+                    result.messages.Add("Character '.' not in allowed characters");
+                    isValid = false;
+                }
+            }
+
+            if (anomalyChars == null || anomalyChars.Length == 0)
+            {
+                result.messages.Add(ErrorText.kErrAnomalyCharsEmpty);
+                isValid = false;
+            }
+
+            if (isValid)
+            {
+                if (!CheckCharactersIntersection(this.allowedChars, this.anomalyChars))
+                {
+                    result.messages.Add(ErrorText.kErrSharedCharacters);
+                    isValid = false;
+                }
+            }
+
             // Validate minimum length
             if (!this.minLengthOk)
             {
@@ -101,9 +135,9 @@ namespace ExtTDG
                 isValid = false;
             }
 
-            if (this.minLength < 0)
+            if (this.minLengthOk && this.minLength < 6)
             {
-                result.messages.Add(ErrorText.kErrMinLZeroLen);
+                result.messages.Add(ErrorText.kErrMinNoLessThanLen + "6");
                 isValid = false;
             }
 
@@ -120,14 +154,47 @@ namespace ExtTDG
                 isValid = false;
             }
 
-            if (this.maxLength < this.minLength)
+            if (this.maxLengthOk && this.maxLength < this.minLength)
             {
                 result.messages.Add(ErrorText.kErrMaxLEMinLen);
                 isValid = false;
             }
 
+            // Validate availability of unique emails
+            if (this.uniqueStrings && !(allowedChars == null) && allowedChars.Length > 0)
+            {
+                int maxLenLimit = Convert.ToInt32(Math.Ceiling(Math.Log(2 * numItems, allowedChars.Length))) + 4;
+                if (maxLenLimit > maxLength)
+                {
+                    result.messages.Add(ErrorText.kErrNoUniqueGuaranteeRaiseToMaxLen + maxLenLimit.ToString());
+                    isValid = false;
+                }
+            }
+
             result.isValid = isValid;
             return result.isValid;
+        }
+
+        private bool CheckCharactersIntersection(string s1, string s2)
+        {
+            HashSet<char> set1 = new HashSet<char>();
+            HashSet<char> set2 = new HashSet<char>();
+
+            foreach (char c in s1)
+                set1.Add(c);
+
+            foreach (char c in s2)
+                set2.Add(c);
+
+            foreach (char c in set1)
+            {
+                if (set2.Contains(c))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
 
@@ -142,11 +209,11 @@ namespace ExtTDG
             if (!this.hasAnomalies)
                 anomalyProb = 0;
 
-            if (this.uniqueStrings && numItems > 10000000)
-            {
-                this.uniqueStrings = false;
-                Console.WriteLine("Generating over 10 000 000 names. Request for unique names is ignored.");
-            }
+            //if (this.uniqueStrings && numItems > 10000000)
+            //{
+            //    this.uniqueStrings = false;
+            //    Console.WriteLine("Generating over 10 000 000 names. Request for unique names is ignored.");
+            //}
 
             string name;
             for (int i = 0; i < numItems; i++)
