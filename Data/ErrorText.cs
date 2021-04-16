@@ -11,6 +11,7 @@ namespace ExtTDG.Data
         // Allowed / anomaly characters error texts
         public static readonly string kErrAllowedCharsEmpty = "Allowed characters empty";
         public static readonly string kErrAnomalyCharsEmpty = "Anomaly characters empty";
+        public static readonly string kErrSharedCharacters = "Same characters in allowed and anomaly characters";
 
         // Minimum length / value error texts
         public static readonly string kErrParseMinLen = "Cannot parse minimum length";

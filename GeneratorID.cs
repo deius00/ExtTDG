@@ -57,7 +57,7 @@ namespace ExtTDG
             {
                 if (!CheckCharactersIntersection(this.allowedChars, this.anomalyChars))
                 {
-                    result.messages.Add("Same characters in allowed and anomaly characters");
+                    result.messages.Add(ErrorText.kErrSharedCharacters);
                     isValid = false;
                 }
             }
