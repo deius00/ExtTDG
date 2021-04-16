@@ -308,10 +308,12 @@
             // 
             // tbLogs
             // 
+            this.tbLogs.AcceptsReturn = true;
             this.tbLogs.Location = new System.Drawing.Point(6, 16);
             this.tbLogs.Multiline = true;
             this.tbLogs.Name = "tbLogs";
             this.tbLogs.ReadOnly = true;
+            this.tbLogs.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.tbLogs.Size = new System.Drawing.Size(205, 195);
             this.tbLogs.TabIndex = 0;
             // 

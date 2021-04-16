@@ -179,7 +179,6 @@ namespace ExtTDG
                 tsProgressBar.Value = 0;
 
                 // Reset toolstrip status text and logs
-                tsStatusDuration.Text = "Generating...";
                 tbLogs.Text = "";
 
                 // Get new list of generators
@@ -201,16 +200,34 @@ namespace ExtTDG
 
                 if (!isValidationOk)
                 {
-                    // Show errors and return
-                    foreach(string s in validationErrorMessages)
+                    tbLogs.Text = "";
+                    tsStatusDuration.Text = "Validation errors. Check logs.";
+
+                    string[] splitter = { "\n" };
+                    foreach (string s in validationErrorMessages)
                     {
-                        Console.WriteLine(s);
+                        // Tokenize string
+                        string[] msg = s.Split(splitter, StringSplitOptions.None);
+                        string[] generatorName = msg[0].Split(':');
+                        for(int i = 0; i < msg.Length; i++)
+                        {
+                            if(i == 0)
+                            {
+                                // Show generator name separately
+                                tbLogs.AppendText(generatorName[0] + ":" + System.Environment.NewLine);
+                            }
+                            else
+                            {
+                                tbLogs.AppendText(msg[i] + System.Environment.NewLine);
+                            }
+                        }
                     }
 
                     return;
                 }
 
                 // Run subgenerators
+                tsStatusDuration.Text = "Generating...";
                 foreach (GeneratorParameters gp in m_generatorParameters)
                 {
                     Stopwatch sw = new Stopwatch();
@@ -329,12 +346,11 @@ namespace ExtTDG
 
         private void SaveResultsToFile()
         {
-            object Nothing = System.Reflection.Missing.Value;
             ExcelApplication app = new ExcelApplication();
+            ExcelWorkbook workBook = app.Workbooks.Add();
+            ExcelWorksheet workSheet = app.ActiveSheet;
             app.Visible = false;
             app.DisplayAlerts = false;
-            ExcelWorkbook workBook = app.Workbooks.Add(Nothing);
-            ExcelWorksheet workSheet = workBook.Sheets[1];
             workSheet.Name = "Results";
 
             // Convert each generator results to array and write it in one go
@@ -477,7 +493,7 @@ namespace ExtTDG
             dgvGenerators.Rows[6].Cells[0].Value = false;
             dgvGenerators.Rows[7].Cells[0].Value = false;
             dgvGenerators.Rows[8].Cells[0].Value = false;
-            tbFilePath.Text = "C:\\Users\\Janne\\Desktop\\Tulokset\\results.xlsx";
+            tbFilePath.Text = "C:\\Users\\janne\\Desktop\\results\\results.xlsx";
             cbAllowOverwrite.Checked = true;
         }
     }
