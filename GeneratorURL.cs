@@ -42,11 +42,11 @@ namespace ExtTDG
 				isValid = false;
 			}
 
-			if (this.minLength >= maxLength)
-			{
-				result.messages.Add(ErrorText.kErrMinGEMaxLen);
-				isValid = false;
-			}
+			//if (this.minLength >= maxLength)
+			//{
+			//	result.messages.Add(ErrorText.kErrMinGEMaxLen);
+			//	isValid = false;
+			//}
 
 			// Validate maxLength
 			if (!this.isMaxLengthOk)
@@ -55,7 +55,7 @@ namespace ExtTDG
 				isValid = false;
 			}
 
-			if (this.maxLength <= this.minLength)
+			if (isValid && this.maxLength < this.minLength)
 			{
 				result.messages.Add(ErrorText.kErrMaxLEMinLen);
 				isValid = false;
@@ -76,13 +76,13 @@ namespace ExtTDG
 			}
 
 			// Validate uniqueness and number count (is unique / not unique)
-			if (this.isUnique)
+			if (isValid && this.isUnique)
 			{
 				string uniqueAllowedChars = GetUniqueAllowedChars(this.allowedChars);
 				BigInteger numUniqueCharacters = new BigInteger(uniqueAllowedChars.Length);
 				BigInteger powResult = System.Numerics.BigInteger.Pow(numUniqueCharacters, this.maxLength);
 				int numPossibilitiesCharacterCount = (int)System.Numerics.BigInteger.Log10(powResult);
-				int numItemsCharacterCount = (int)Math.Log10(numItems);
+				int numItemsCharacterCount = (int)Math.Log10(2*numItems);
 				if (numItemsCharacterCount >= numPossibilitiesCharacterCount)
 				{
 					result.messages.Add(ErrorText.kErrNoUniqueGuaranteeExpandRange);

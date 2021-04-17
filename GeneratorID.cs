@@ -79,13 +79,7 @@ namespace ExtTDG
             // Validate min/max swap
             if(isValid)
             {
-                if (this.minLength >= this.maxLength)
-                {
-                    result.messages.Add(ErrorText.kErrMinGEMaxLen);
-                    isValid = false;
-                }
-
-                if (this.maxLength <= this.minLength)
+                if (this.maxLength < this.minLength)
                 {
                     result.messages.Add(ErrorText.kErrMaxLEMinLen);
                     isValid = false;
@@ -93,31 +87,31 @@ namespace ExtTDG
             }
 
             // Validate uniqueness and number count (is unique / not unique)
-            if (this.uniqueStrings)
+            if (isValid && this.uniqueStrings)
             {
                 string uniqueAllowedChars = GetUniqueAllowedChars(this.allowedChars);
                 BigInteger numUniqueCharacters = new BigInteger(uniqueAllowedChars.Length);
                 BigInteger numPossibilities = System.Numerics.BigInteger.Pow(numUniqueCharacters, this.maxLength);
                 int numPossibilitiesCharacterCount = (int)System.Numerics.BigInteger.Log10(numPossibilities);
-                int numItemsCharacterCount = (int)Math.Log10(numItems);
+                int numItemsCharacterCount = (int)Math.Log10(2*numItems);
                 if (numItemsCharacterCount >= numPossibilitiesCharacterCount)
                 {
                     result.messages.Add(ErrorText.kErrNoUniqueGuaranteeExpandRange);
                     isValid = false;
                 }
             }
-            else
-            {
-                string uniqueAllowedChars = GetUniqueAllowedChars(this.allowedChars);
-                BigInteger numUniqueCharacters = new BigInteger(uniqueAllowedChars.Length);
-                BigInteger numPossibilities = System.Numerics.BigInteger.Pow(numUniqueCharacters, this.maxLength);
-                BigInteger biNumItems = new BigInteger(numItems);
-                if (biNumItems > numPossibilities)
-                {
-                    result.messages.Add(ErrorText.kErrTooManyItems);
-                    isValid = false;
-                }
-            }
+            //else
+            //{
+            //    string uniqueAllowedChars = GetUniqueAllowedChars(this.allowedChars);
+            //    BigInteger numUniqueCharacters = new BigInteger(uniqueAllowedChars.Length);
+            //    BigInteger numPossibilities = System.Numerics.BigInteger.Pow(numUniqueCharacters, this.maxLength);
+            //    BigInteger biNumItems = new BigInteger(2*numItems);
+            //    if (biNumItems > numPossibilities)
+            //    {
+            //        result.messages.Add(ErrorText.kErrTooManyItems);
+            //        isValid = false;
+            //    }
+            //}
 
             // Modify letters and numbers if valid
             if (isValid)

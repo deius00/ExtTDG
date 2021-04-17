@@ -66,7 +66,7 @@ namespace ExtTDG
             }
             else
             {
-                result.messages.Add("Invalid min date");
+                result.messages.Add("Invalid min date.");
                 isValid = false;
                 minMaxOk = false;
             }
@@ -80,7 +80,7 @@ namespace ExtTDG
             }
             else
             {
-                result.messages.Add("Invalid max date");
+                result.messages.Add("Invalid max date.");
                 isValid = false;
                 minMaxOk = false;
             }
@@ -88,17 +88,17 @@ namespace ExtTDG
             // Validate order of limit dates
             if (minMaxOk && this.minDate.CompareTo(this.maxDate) > 0) 
             {
-                result.messages.Add("Minimum date after maximum date");
+                result.messages.Add("Minimum date after maximum date.");
                 isValid = false;
             }
 
             // Validate availability of unique dates.
-            if (this.uniqueDates)
+            if (isValid && this.uniqueDates)
             {
                 Console.WriteLine((this.maxDate - this.minDate).TotalDays);
                 if (numItems > 1000000)
                 {
-                    result.messages.Add("Cannot generate more than 1 000 000 unique dates");
+                    result.messages.Add("Cannot guarantee more than 1 000 000 unique dates.");
                     isValid = false;
                 }
                 else if (minMaxOk && (this.maxDate - this.minDate).TotalDays <= (2 * numItems))

@@ -73,13 +73,7 @@ namespace ExtTDG
             // Validate min/max swap
             if (isValid)
             {
-                if (this.minLength >= this.maxLength)
-                {
-                    result.messages.Add(ErrorText.kErrMinGEMaxLen);
-                    isValid = false;
-                }
-
-                if (this.maxLength <= this.minLength)
+                if (this.maxLength < this.minLength)
                 {
                     result.messages.Add(ErrorText.kErrMaxLEMinLen);
                     isValid = false;
@@ -89,8 +83,8 @@ namespace ExtTDG
             string uniqueAllowedChars = GetUniqueAllowedChars(this.allowedChars);
             BigInteger numUniqueCharacters = new BigInteger(uniqueAllowedChars.Length);
             BigInteger numPossibilities = System.Numerics.BigInteger.Pow(numUniqueCharacters, this.maxLength);
-            BigInteger biNumItems = new BigInteger(numItems);
-            if (biNumItems > numPossibilities)
+            BigInteger biNumItems = new BigInteger(2*numItems);
+            if (isValid && biNumItems > numPossibilities)
             {
                 result.messages.Add(ErrorText.kErrNoUniqueGuaranteeExpandRange);
                 isValid = false;

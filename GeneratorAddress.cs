@@ -44,12 +44,6 @@ namespace ExtTDG
 				isValid = false;
 			}
 
-			if (this.minValue >= maxValue)
-			{
-				result.messages.Add(ErrorText.kErrMinGEMaxLen);
-				isValid = false;
-			}
-
 			// Validate maxLength
 			if (!this.isMaxValueOk)
 			{
@@ -57,7 +51,13 @@ namespace ExtTDG
 				isValid = false;
 			}
 
-			if (this.maxValue <= this.minValue)
+			// Validate the order of limits
+			if (this.isMinValueOk && this.isMaxValueOk && this.minValue >= maxValue)
+			{
+				result.messages.Add(ErrorText.kErrMinGEMaxLen);
+				isValid = false;
+			}
+			if (this.isMinValueOk && this.isMaxValueOk && this.maxValue <= this.minValue)
 			{
 				result.messages.Add(ErrorText.kErrMaxLEMinLen);
 				isValid = false;

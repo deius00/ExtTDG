@@ -63,37 +63,45 @@ namespace ExtTDG
                 isValid = false;
             }
 
-            if (this.minLength >= maxLength)
-            {
-                result.messages.Add(ErrorText.kErrMinGEMaxLen);
-                isValid = false;
-            }
-
             // Validate maxLength
             if (this.maxLength < 0)
             {
                 result.messages.Add(ErrorText.kErrParseMaxLen);
                 isValid = false;
             }
-
-            if (this.maxLength == 0)
+            else if (this.maxLength < 8)
             {
-                result.messages.Add(ErrorText.kErrMaxNoZeroAllowedLen);
+                result.messages.Add(ErrorText.kErrMaxNoLessThanLen + "8");
                 isValid = false;
             }
 
-            if (this.maxLength <= this.minLength)
+            if (isValid && this.minLength >= maxLength)
             {
-                result.messages.Add(ErrorText.kErrMaxLEMinLen);
+                result.messages.Add(ErrorText.kErrMinGEMaxLen);
                 isValid = false;
             }
 
             // Validate uniqueness and possible unique item count problem
-            if (this.uniqueStrings)
+            if (isValid && this.uniqueStrings)
             {
-                if (maxLength < 8)
+                if (numItems > 10000 && numItems <= 100000 && maxLength < 10)
                 {
-                    result.messages.Add(ErrorText.kErrNoUniqueGuaranteeRaiseToMaxLen + " 8");
+                    result.messages.Add(ErrorText.kErrNoUniqueGuaranteeRaiseToMaxLen + "10");
+                    isValid = false;
+                }
+                else if (numItems > 100000 && numItems <= 1000000 && maxLength < 12)
+                {
+                    result.messages.Add(ErrorText.kErrNoUniqueGuaranteeRaiseToMaxLen + "12");
+                    isValid = false;
+                }
+                else if (numItems > 1000000 && numItems <= 10000000 && maxLength < 14)
+                {
+                    result.messages.Add(ErrorText.kErrNoUniqueGuaranteeRaiseToMaxLen + "14");
+                    isValid = false;
+                }
+                else if (numItems > 10000000)
+                {
+                    result.messages.Add("Cannot guarantee more than 10 000 000 unique names.");
                     isValid = false;
                 }
             }
@@ -113,12 +121,6 @@ namespace ExtTDG
             if (!this.hasAnomalies)
             {
                 anomalyProb = 0;
-            }
-
-            if (this.uniqueStrings && numItems > 10000000)
-            {
-                this.uniqueStrings = false;
-                Console.WriteLine("Generating over 10 000 000 names. Request for unique names is ignored.");
             }
 
             string name;

@@ -141,12 +141,6 @@ namespace ExtTDG
                 isValid = false;
             }
 
-            if (this.minLength >= this.maxLength)
-            {
-                result.messages.Add(ErrorText.kErrMinGEMaxLen);
-                isValid = false;
-            }
-
             // Validate maximum length
             if (!this.maxLengthOk)
             {
@@ -154,14 +148,15 @@ namespace ExtTDG
                 isValid = false;
             }
 
-            if (this.maxLengthOk && this.maxLength < this.minLength)
+            // Validate limit order
+            if (this.minLengthOk && this.maxLengthOk && this.maxLength < this.minLength)
             {
                 result.messages.Add(ErrorText.kErrMaxLEMinLen);
                 isValid = false;
             }
 
             // Validate availability of unique emails
-            if (this.uniqueStrings && !(allowedChars == null) && allowedChars.Length > 0)
+            if (isValid && this.uniqueStrings)
             {
                 int maxLenLimit = Convert.ToInt32(Math.Ceiling(Math.Log(2 * numItems, allowedChars.Length))) + 4;
                 if (maxLenLimit > maxLength)
@@ -200,6 +195,9 @@ namespace ExtTDG
 
         public List<string> Generate(int numItems, double anomalyChance, Random rng)
         {
+            this.allowedChars = this.allowedChars.Replace("@", "");
+            this.allowedChars = this.allowedChars.Replace(".", "");
+
             HashSet<string> alreadyGenerated = new HashSet<string>();
             List<string> results = new List<string>();
 
@@ -233,6 +231,8 @@ namespace ExtTDG
                     i--;
             }
 
+            this.allowedChars += "@.";
+
             return results;
         }
 
@@ -241,8 +241,12 @@ namespace ExtTDG
             string[] suffixes = new string[3] { ".net", ".com", ".fi" };
             string email;
 
-            string suff = suffixes[rng.Next(suffixes.Length)];
-            email = GenerateNamePart(allowed, this.minLength - suff.Length - 5, this.maxLength - suff.Length - 3, rng);
+            string suff;
+            if (this.maxLength == 6)
+                suff = ".fi";
+            else
+                suff = suffixes[rng.Next(suffixes.Length)];
+            email = GenerateNamePart(allowed, this.minLength - suff.Length - 2, this.maxLength - suff.Length - 2, rng);
             email += GenerateDomainPart(allowed, this.minLength - suff.Length - email.Length, 
                 this.maxLength - suff.Length - email.Length, rng);
             email += suff;
@@ -287,14 +291,14 @@ namespace ExtTDG
                         break;
                     }
                 }
-            } while (tries < 3 && (namePart.Length < minLen || namePart.Length > maxLen || allowedCharsOnly));
+            } while (tries < 3 && (namePart.Length < minLen || namePart.Length > maxLen || !allowedCharsOnly));
 
-            if (tries == 3 && (namePart.Length < minLen || namePart.Length > maxLen || allowedCharsOnly))
+            if (tries == 3 && (namePart.Length < minLen || namePart.Length > maxLen || !allowedCharsOnly))
             {
                 int min = 1;
                 if (minLen > 1)
                     min = minLen - 1;
-                int len = rng.Next(min, maxLen);
+                int len = rng.Next(min, maxLen+1);
 
                 namePart = "";
                 for (int n = 0; n < len; n++)
@@ -335,7 +339,7 @@ namespace ExtTDG
             int min = 1;
             if (minLen > 1)
                 min = minLen - 1;
-            int len = rng.Next(min, maxLen-2);
+            int len = rng.Next(min, maxLen);
 
             for (int n = 0; n < len; n++)
                 domain += this.allowedChars[rng.Next(this.allowedChars.Length)];

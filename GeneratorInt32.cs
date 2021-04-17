@@ -41,12 +41,6 @@ namespace ExtTDG
 				isValid = false;
 			}
 
-			if (this.minValue >= maxValue)
-			{
-				result.messages.Add(ErrorText.kErrMinGEMaxLen);
-				isValid = false;
-			}
-
 			// Validate maxLength
 			if (!this.maxValueOk)
 			{
@@ -54,9 +48,10 @@ namespace ExtTDG
 				isValid = false;
 			}
 
-			if (this.maxValue <= this.minValue)
+			// Validate order of limit lenghts
+			if (isValid && this.minValue >= maxValue)
 			{
-				result.messages.Add(ErrorText.kErrMaxLEMinLen);
+				result.messages.Add(ErrorText.kErrMinGEMaxLen);
 				isValid = false;
 			}
 
@@ -91,20 +86,12 @@ namespace ExtTDG
 			}
 
 
-			if (this.isUnique)
+			if (isValid && this.isUnique)
 			{
 				// Number range must have at least 10 % overhead because of uniqueness
 				if (possibleNumbers < (numItems * 1.1))
 				{
 					result.messages.Add(ErrorText.kErrNoUniqueGuaranteeExpandRange);
-					isValid = false;
-				}
-			}
-			else
-			{
-				if (possibleNumbers < numItems)
-				{
-					result.messages.Add(ErrorText.kErrTooManyItems);
 					isValid = false;
 				}
 			}
