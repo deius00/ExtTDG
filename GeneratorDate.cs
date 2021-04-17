@@ -95,12 +95,13 @@ namespace ExtTDG
             // Validate availability of unique dates.
             if (this.uniqueDates)
             {
+                Console.WriteLine((this.maxDate - this.minDate).TotalDays);
                 if (numItems > 1000000)
                 {
                     result.messages.Add("Cannot generate more than 1 000 000 unique dates");
                     isValid = false;
-                } 
-                else if (minMaxOk && this.maxDate.CompareTo(this.minDate) <= 2 * numItems)
+                }
+                else if (minMaxOk && (this.maxDate - this.minDate).TotalDays <= (2 * numItems))
                 {
                     result.messages.Add(ErrorText.kErrNoUniqueGuaranteeExpandRange);
                     isValid = false;
@@ -177,87 +178,11 @@ namespace ExtTDG
             return isMaxDateOk;
         }
 
-
-        //public void SetDateFormat(string formatStr)
-        //{
-        //    int temp;
-        //    try {
-        //        temp = Int32.Parse(formatStr);
-        //        if (temp == 1 || temp == 2) 
-        //        {
-        //            this.dateFormat = temp;
-        //        }
-        //    } catch (Exception e)
-        //    {
-        //        Console.WriteLine("Given date format not recognized, default will be used.");
-        //    }
-        //}
-
-        //public void SetMinDate(string minDate)
-        //{
-        //    try 
-        //    {
-        //        int date = Int32.Parse(minDate);
-        //        int year = date / 10000;
-        //        int month = (date - year*10000) / 100;
-        //        int day = date - year*10000 - month*100;
-
-        //        this.minDate = new DateTime(year, month, day);  // trhows an exception if not possible
-        //        this.specifiedRange = true;
-        //    } catch (Exception e)
-        //    {
-        //        this.minDate = new DateTime(1000, 1, 1);
-        //    }
-        //}
-
-        //public void SetMaxDate(string maxDate)
-        //{
-        //    try 
-        //    {
-        //        int date = Int32.Parse(maxDate);
-        //        int year = date / 10000;
-        //        int month = (date - year*10000) / 100;
-        //        int day = date - year*10000 - month*100;
-
-        //        this.maxDate = new DateTime(year, month, day);  // trhows an exception if not possible
-        //        this.specifiedRange = true;
-        //    } catch (Exception e)
-        //    {
-        //        this.maxDate = new DateTime(9999, 12, 31);
-        //    }
-        //}
-
-        //private void CheckLimitDates()
-        //{
-        //    if (this.minDate.CompareTo(this.maxDate) > 0)
-        //    {
-        //        this.minDate = new DateTime(1000, 1, 1);
-        //        this.maxDate = new DateTime(9999, 12, 31);
-        //        this.specifiedRange = false;
-        //    }
-        //}
-
-        //private void CheckAmountOfOptionsForUnique(int amount)
-        //{
-        //    if (amount > 100000)
-        //    {
-        //        this.uniqueDates = false;
-        //    }
-        //    else if (this.maxDate.CompareTo(this.minDate) <= 2*amount)
-         //   {
-         //       this.minDate = new DateTime(1000, 1, 1);
-         //       this.maxDate = new DateTime(9999, 12, 31);
-         //       this.specifiedRange = false;
-         //   }
-        //}
-
         public List<string> Generate(int numItems, double anomalyChance, Random rng)
 		{
 			HashSet<string> alreadyGenerated = new HashSet<string>();
 			List<string> results = new List<string>();
 
-            //CheckLimitDates();
-            //CheckAmountOfOptionsForUnique(numItems);
             double anomalyProb = 0;
             if (this.hasAnomalies)
             {

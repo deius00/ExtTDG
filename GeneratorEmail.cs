@@ -101,12 +101,12 @@ namespace ExtTDG
             }
             else
             {
-                if (allowedChars.Contains("@")) 
+                if (!allowedChars.Contains("@")) 
                 {
                     result.messages.Add("Character '@' not in allowed characters");
                     isValid = false;
                 }
-                if (allowedChars.Contains("."))
+                if (!allowedChars.Contains("."))
                 {
                     result.messages.Add("Character '.' not in allowed characters");
                     isValid = false;

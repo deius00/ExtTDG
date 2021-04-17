@@ -107,7 +107,7 @@ namespace ExtTDG
             // Set default min/maxvalues for each DataClassType
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Name, "1", "50");
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Int32, "0", "1500");
-            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Email, "5", "50");
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Email, "6", "50");
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Date, "10000101", "99991231");
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Address, "0", "50");
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Phone, "7", "12");
@@ -203,13 +203,16 @@ namespace ExtTDG
                     tsStatusDuration.Text = "Validation errors. Check logs.";
                     foreach(ValidationResult res in validationResults)
                     {
-                        tbLogs.AppendText(res.generatorName + System.Environment.NewLine);
-                        foreach(string msg in res.messages)
+                        if(!res.isValid)
                         {
-                            tbLogs.AppendText("- " + msg + System.Environment.NewLine);
-                        }
-                        tbLogs.AppendText(System.Environment.NewLine);
 
+                            tbLogs.AppendText(res.generatorName + System.Environment.NewLine);
+                            foreach (string msg in res.messages)
+                            {
+                                tbLogs.AppendText("- " + msg + System.Environment.NewLine);
+                            }
+                            tbLogs.AppendText(System.Environment.NewLine);
+                        }
                     }
                     return;
                 }
@@ -462,7 +465,7 @@ namespace ExtTDG
             }
             else
             {
-                genText = "Saving aborted by user.";
+                genText = "Saving aborted by user. Results not saved file.";
                 message = genText;
             }
 
@@ -472,17 +475,17 @@ namespace ExtTDG
 
         private void ValidateTest()
         {
-            dgvGenerators.Rows[0].Cells[0].Value = false;
-            dgvGenerators.Rows[1].Cells[0].Value = false;
-            dgvGenerators.Rows[2].Cells[0].Value = false;
-            dgvGenerators.Rows[3].Cells[0].Value = false;
-            dgvGenerators.Rows[4].Cells[0].Value = false;
-            dgvGenerators.Rows[5].Cells[0].Value = false;
-            dgvGenerators.Rows[6].Cells[0].Value = false;
-            dgvGenerators.Rows[7].Cells[0].Value = false;
+            //dgvGenerators.Rows[0].Cells[0].Value = false;
+            //dgvGenerators.Rows[1].Cells[0].Value = false;
+            //dgvGenerators.Rows[2].Cells[0].Value = false;
+            //dgvGenerators.Rows[3].Cells[0].Value = false;
+            //dgvGenerators.Rows[4].Cells[0].Value = false;
+            //dgvGenerators.Rows[5].Cells[0].Value = false;
+            //dgvGenerators.Rows[6].Cells[0].Value = false;
+            //dgvGenerators.Rows[7].Cells[0].Value = false;
             //dgvGenerators.Rows[8].Cells[0].Value = false;
-            tbFilePath.Text = "C:\\Users\\janne\\Desktop\\results\\results.xlsx";
-            cbAllowOverwrite.Checked = true;
+            //tbFilePath.Text = "C:\\Users\\janne\\Desktop\\results\\results.xlsx";
+            //cbAllowOverwrite.Checked = true;
         }
     }
 }
