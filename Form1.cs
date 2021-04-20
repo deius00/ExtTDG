@@ -68,52 +68,77 @@ namespace ExtTDG
         private void Form1_Load(object sender, EventArgs e)
         {
             // Define default allowed and anomaly characters for DataClass type
+            // Name
             m_dataClassRegistry.SetDefaultCharacters(DataClassType.Name,
                 "abcdefghijklmnopqrstuvwxyzåäöABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ-'",
                 "!#¤%&()?/;.:,_<>|@£${[]}*");
-            
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Name, "1", "50");
+            m_dataClassRegistry.SetDefaultHasAnomalies(DataClassType.Name, true);
+            m_dataClassRegistry.SetDefaultIsUnique(DataClassType.Name, false);
+
+            // Int32
             m_dataClassRegistry.SetDefaultCharacters(DataClassType.Int32,
                 "0123456789",
                 "!#¤%&/()=");
-            
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Int32, "0", "1500");
+            m_dataClassRegistry.SetDefaultHasAnomalies(DataClassType.Int32, true);
+            m_dataClassRegistry.SetDefaultIsUnique(DataClassType.Int32, false);
+
+            // Email
             m_dataClassRegistry.SetDefaultCharacters(DataClassType.Email,
                 "abcdefghijklmnopqrstuvwxyz-@.",
                 "!#¤%&()?/;:,_<>|£${[]}*");
-            
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Email, "6", "50");
+            m_dataClassRegistry.SetDefaultHasAnomalies(DataClassType.Email, true);
+            m_dataClassRegistry.SetDefaultIsUnique(DataClassType.Email, false);
+
+            // Date
             m_dataClassRegistry.SetDefaultCharacters(DataClassType.Date,
                 "0",
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#¤%&()?;:,_<>|@£${[]}");
-            
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Date, "10000101", "99991231");
+            m_dataClassRegistry.SetDefaultHasAnomalies(DataClassType.Date, true);
+            m_dataClassRegistry.SetDefaultIsUnique(DataClassType.Date, false);
+
+            // Address
             m_dataClassRegistry.SetDefaultCharacters(DataClassType.Address,
                 "abcdefghijklmnopqrstuvwxyzåäöABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ-",
                 "!#¤%&/()=?;:,_<>|@£${[]}");
-            
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Address, "0", "50");
+            m_dataClassRegistry.SetDefaultHasAnomalies(DataClassType.Address, true);
+            m_dataClassRegistry.SetDefaultIsUnique(DataClassType.Address, false);
+
+            // Phone
             m_dataClassRegistry.SetDefaultCharacters(DataClassType.Phone,
                 "0123456789",
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#¤%&/()=?;:,_<>|@£${[]}");
-            
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Phone, "7", "12");
+            m_dataClassRegistry.SetDefaultHasAnomalies(DataClassType.Phone, true);
+            m_dataClassRegistry.SetDefaultIsUnique(DataClassType.Phone, false);
+
+            // URL
             m_dataClassRegistry.SetDefaultCharacters(DataClassType.URL,
                 "abcdefghijklmnopqrstuvwxyz1234567890",
                 "!#¤%&/()=?;:,_<>|@£${[]}");
-            
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.URL, "0", "50");
+            m_dataClassRegistry.SetDefaultHasAnomalies(DataClassType.URL, true);
+            m_dataClassRegistry.SetDefaultIsUnique(DataClassType.URL, false);
+
+            // ID
             m_dataClassRegistry.SetDefaultCharacters(DataClassType.ID,
                 "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
                 "!#¤%&/()=?`@£$€{[]}^¨'*~,.;:<>|§½");
-            
+            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.ID, "1", "6");
+            m_dataClassRegistry.SetDefaultHasAnomalies(DataClassType.ID, true);
+            m_dataClassRegistry.SetDefaultIsUnique(DataClassType.ID, false);
+
+            // String
             m_dataClassRegistry.SetDefaultCharacters(DataClassType.String,
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
                 "!#¤%&()?/;.:,_-<>|@£${[]}*");
-
-            // Set default min/maxvalues for each DataClassType
-            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Name, "1", "50");
-            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Int32, "0", "1500");
-            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Email, "6", "50");
-            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Date, "10000101", "99991231");
-            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Address, "0", "50");
-            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.Phone, "7", "12");
-            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.URL, "0", "50");
-            m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.ID, "1", "6");
             m_dataClassRegistry.SetDefaultMinMaxValues(DataClassType.String, "1", "15");
+            m_dataClassRegistry.SetDefaultHasAnomalies(DataClassType.String, true);
+            m_dataClassRegistry.SetDefaultIsUnique(DataClassType.String, false);
 
             // Parses rows and converts them into list of generator parameters
             // Only active and supported rows (determined by DataClassType)
@@ -123,7 +148,6 @@ namespace ExtTDG
             // Insert default rows to DataGridView
             Utility.SetDefaultRowData(dgvGenerators, m_dataClassRegistry);
             DeactivateGenerateButton();
-            ValidateTest();
         }
 
         private void btnGenerate_Click(object sender, EventArgs e)
@@ -471,21 +495,6 @@ namespace ExtTDG
 
             tsStatusDuration.Text = message;
             ActivateGenerateButton();
-        }
-
-        private void ValidateTest()
-        {
-            //dgvGenerators.Rows[0].Cells[0].Value = false;
-            //dgvGenerators.Rows[1].Cells[0].Value = false;
-            //dgvGenerators.Rows[2].Cells[0].Value = false;
-            //dgvGenerators.Rows[3].Cells[0].Value = false;
-            //dgvGenerators.Rows[4].Cells[0].Value = false;
-            //dgvGenerators.Rows[5].Cells[0].Value = false;
-            //dgvGenerators.Rows[6].Cells[0].Value = false;
-            //dgvGenerators.Rows[7].Cells[0].Value = false;
-            //dgvGenerators.Rows[8].Cells[0].Value = false;
-            //tbFilePath.Text = "D:\\yliopisto\\tkt\\OHTU II\\R09-UiPath\\TestData\\results.xlsx";
-            //cbAllowOverwrite.Checked = true;
         }
     }
 }

@@ -11,6 +11,9 @@ namespace ExtTDG
             public string anomalyCharacters { get; set; }
             public string minimumValue { get; set; }
             public string maximumValue { get; set; }
+
+            public bool hasAnomalies { get; set; }
+            public bool isUnique { get; set; }
             
             public DefaultValue()
             {
@@ -18,6 +21,8 @@ namespace ExtTDG
                 anomalyCharacters = "";
                 minimumValue = "";
                 maximumValue = "";
+                hasAnomalies = false;
+                isUnique = false;
             }
         }
 
@@ -60,6 +65,28 @@ namespace ExtTDG
             throw new Exception("No key " + type.ToString() + " in DataClassRegistry");
         }
 
+        public bool GetDefaultHasAnomalies(DataClassType type)
+        {
+
+            if (defaults.ContainsKey(type))
+            {
+                return defaults[type].hasAnomalies;
+            }
+
+            throw new Exception("No key " + type.ToString() + " in DataClassRegistry");
+        }
+
+        public bool GetDefaultIsUnique(DataClassType type)
+        {
+
+            if (defaults.ContainsKey(type))
+            {
+                return defaults[type].isUnique;
+            }
+
+            throw new Exception("No key " + type.ToString() + " in DataClassRegistry");
+        }
+
         public void SetDefaultMinMaxValues(DataClassType type, string minValue, string maxValue)
         {
             DefaultValue values = GetEntry(type);
@@ -73,6 +100,20 @@ namespace ExtTDG
             DefaultValue values = GetEntry(type);
             values.allowedCharacters = allowedChars;
             values.anomalyCharacters = anomalyChars;
+            defaults[type] = values;
+        }
+
+        public void SetDefaultHasAnomalies(DataClassType type, bool hasAnomalies)
+        {
+            DefaultValue values = GetEntry(type);
+            values.hasAnomalies = hasAnomalies;
+            defaults[type] = values;
+        }
+
+        public void SetDefaultIsUnique(DataClassType type, bool isUnique)
+        {
+            DefaultValue values = GetEntry(type);
+            values.isUnique = isUnique;
             defaults[type] = values;
         }
 
