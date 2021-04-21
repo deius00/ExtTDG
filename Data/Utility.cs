@@ -25,7 +25,7 @@ namespace ExtTDG.Data
             for(int i = 0; i < defaultGenerators.Length; i++)
             {
                 dgv.Rows[i].Cells[0].Value = true;
-                dgv.Rows[i].Cells[1].Value = DataClassType.Name;
+                dgv.Rows[i].Cells[1].Value = defaultGenerators[i];
                 dgv.Rows[i].Cells[2].Value = dcr.GetDefaultAllowedChars(defaultGenerators[i]);
                 dgv.Rows[i].Cells[3].Value = dcr.GetDefaultAnomalyChars(defaultGenerators[i]);
                 dgv.Rows[i].Cells[4].Value = dcr.GetDefaultMinValue(defaultGenerators[i]);
