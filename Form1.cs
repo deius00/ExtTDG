@@ -140,13 +140,14 @@ namespace ExtTDG
             m_dataClassRegistry.SetDefaultHasAnomalies(DataClassType.String, true);
             m_dataClassRegistry.SetDefaultIsUnique(DataClassType.String, false);
 
+            // Insert default rows to DataGridView
+            Utility.SetDefaultRowData(dgvGenerators, m_dataClassRegistry);
+
             // Parses rows and converts them into list of generator parameters
             // Only active and supported rows (determined by DataClassType)
             // are added to list.
             m_rowParser = new RowParser(dgvGenerators, m_dataClassRegistry);
 
-            // Insert default rows to DataGridView
-            Utility.SetDefaultRowData(dgvGenerators, m_dataClassRegistry);
             DeactivateGenerateButton();
         }
 
