@@ -92,7 +92,7 @@ namespace ExtTDG
 				string newItem = GenerateRandomAddress(Addresses.kAddresses, rng);
 				if(hasAnomalies)
                 {
-					if(anomalyChance < rng.NextDouble())
+					if(rng.NextDouble() < anomalyChance)
                     {
 						newItem = GenerateAnomaly(newItem, rng);
 					}
