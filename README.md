@@ -1,10 +1,9 @@
 # ExtTDG
 ExtTDG - External DataGenerator for R09 project
 
-LICENSE:
 MIT License
 
-Copyright (c) 2021 [fullname]
+Copyright (c) 2021 / Taneli Korhonen, Janne Järvikylä, Joonas Sormunen, Antti Ikonen, Minna Keränen, Niko Kekkonen, Vili Marttila
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
